@@ -27,7 +27,11 @@ const gameBoard = (function () {
     getBoard();
   };
 
-  return { insertToken, getBoard, resetBoard };
+  const isBoardFilledUp = () => {
+    return board.filter((child) => child == null).length;
+  };
+
+  return { insertToken, getBoard, resetBoard, isBoardFilledUp };
 })();
 
 function createPlayer(name, mark) {
@@ -48,7 +52,7 @@ function createPlayer(name, mark) {
 function gameController(player1, player2) {
   const board = gameBoard.getBoard();
 
-    let boardIsFilledUp = board.every((child) => child !== null);
+  let boardIsFilledUp = board.every((child) => child !== null);
   const checkWinner = (playersMark) => {
     if (
       (board[0] == playersMark &&
@@ -81,9 +85,9 @@ function gameController(player1, player2) {
           ? player1.getName()
           : player2.getName();
 
-      console.log(`${winningPlayersName} ${playersMark} wins!!!.`);
+      console.log(`${playersMark}:${winningPlayersName} wins!!!.`);
       gameBoard.resetBoard();
-    } else if (boardIsFilledUp) {
+    } else if (gameBoard.isBoardFilledUp() == 0) {
       console.log("Game ended in a tie");
       gameBoard.resetBoard();
     }
