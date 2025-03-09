@@ -11,7 +11,7 @@ const gameBoard = (function () {
       return;
     } else {
       board[position] = playerMark;
-      gameController.checkWinner(playerMark);
+      controller.checkWinner(playerMark);
       console.log(board);
     }
   };
@@ -30,7 +30,7 @@ const gameBoard = (function () {
   return { insertToken, getBoard, resetBoard };
 })();
 
-function createPlayer(mark) {
+function createPlayer(name, mark) {
   const playAtPosition = (position) => {
     gameBoard.insertToken(position, mark);
   };
@@ -38,12 +38,17 @@ function createPlayer(mark) {
   const getMark = () => {
     return mark;
   };
+  const getName = () => {
+    return name;
+  };
 
-  return { playAtPosition, getMark };
+  return { playAtPosition, getMark, getName };
 }
 
-const gameController = (function () {
+function gameController(player1, player2) {
   const board = gameBoard.getBoard();
+
+    let boardIsFilledUp = board.every((child) => child !== null);
   const checkWinner = (playersMark) => {
     if (
       (board[0] == playersMark &&
@@ -71,13 +76,23 @@ const gameController = (function () {
         board[4] == playersMark &&
         board[6] == playersMark)
     ) {
-      console.log(`Player with ${playersMark} wins!!!.`);
+      const winningPlayersName =
+        player1.getMark() == playersMark
+          ? player1.getName()
+          : player2.getName();
+
+      console.log(`${winningPlayersName} ${playersMark} wins!!!.`);
+      gameBoard.resetBoard();
+    } else if (boardIsFilledUp) {
+      console.log("Game ended in a tie");
       gameBoard.resetBoard();
     }
   };
 
   return { checkWinner };
-})();
+}
 
-const player1 = createPlayer("X");
-const player2 = createPlayer("O");
+const player1 = createPlayer("John", "X");
+const player2 = createPlayer("Jane", "O");
+
+const controller = gameController(player1, player2);
