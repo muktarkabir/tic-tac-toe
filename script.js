@@ -1,7 +1,7 @@
 const gameBoard = (function () {
   const board = [null, null, null, null, null, null, null, null, null];
 
-  const insertToken = function (position, playerMark) {
+  const placeMark = function (position, playerMark) {
     if (position > board.length - 1) {
       console.log("Out of Bounds!!!");
       return;
@@ -11,13 +11,12 @@ const gameBoard = (function () {
       return;
     } else {
       board[position] = playerMark;
-      controller.checkWinner(playerMark);
+      controller.setPlayerTurn();
       console.log(board);
     }
-  };
-
-  const getBoard = () => {
-    return board;
+    if (atLeastFiveCellsFilled()) {
+      controller.checkWinner(playerMark);
+    }
   };
 
   const resetBoard = () => {
@@ -27,32 +26,35 @@ const gameBoard = (function () {
     getBoard();
   };
 
-  const isBoardFilledUp = () => {
-    return board.filter((child) => child == null).length;
-  };
+  const getBoard = () => board;
+  const isBoardFilledUp = () => board.filter((child) => child == null).length;
+  const atLeastFiveCellsFilled = () =>
+    board.filter((child) => child != null).length >= 5;
 
-  return { insertToken, getBoard, resetBoard, isBoardFilledUp };
+  return { placeMark, getBoard, resetBoard, isBoardFilledUp };
 })();
 
 function createPlayer(name, mark) {
+  let isMyturn = true;
   const playAtPosition = (position) => {
-    gameBoard.insertToken(position, mark);
+    if (isMyturn) {
+      gameBoard.placeMark(position, mark);
+    } else {
+      console.log("Its not your turn to play");
+      return;
+    }
   };
 
-  const getMark = () => {
-    return mark;
-  };
-  const getName = () => {
-    return name;
-  };
+  const getMark = () => mark;
+  const getName = () => name;
+  const toggleTurn = () => (isMyturn = !isMyturn);
 
-  return { playAtPosition, getMark, getName };
+  return { playAtPosition, getMark, getName, toggleTurn };
 }
 
 function gameController(player1, player2) {
+  player2.toggleTurn();
   const board = gameBoard.getBoard();
-
-  let boardIsFilledUp = board.every((child) => child !== null);
   const checkWinner = (playersMark) => {
     if (
       (board[0] == playersMark &&
@@ -92,8 +94,12 @@ function gameController(player1, player2) {
       gameBoard.resetBoard();
     }
   };
+  const setPlayerTurn = () => {
+    player1.toggleTurn();
+    player2.toggleTurn();
+  };
 
-  return { checkWinner };
+  return { checkWinner, setPlayerTurn };
 }
 
 const player1 = createPlayer("John", "X");
