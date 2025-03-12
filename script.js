@@ -14,7 +14,7 @@ const gameBoard = (function () {
       controller.setPlayerTurn();
       console.log(board);
     }
-    if (atLeastFiveCellsFilled()) {
+    if (atLeastFiveCellsAreFilled()) {
       controller.checkWinner(playerMark);
     }
   };
@@ -28,7 +28,7 @@ const gameBoard = (function () {
 
   const getBoard = () => board;
   const isBoardFilledUp = () => board.filter((child) => child == null).length;
-  const atLeastFiveCellsFilled = () =>
+  const atLeastFiveCellsAreFilled = () =>
     board.filter((child) => child != null).length >= 5;
 
   return { placeMark, getBoard, resetBoard, isBoardFilledUp };
