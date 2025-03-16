@@ -27,11 +27,27 @@ const gameBoard = (function () {
   };
 
   const getBoard = () => board;
-  const isBoardFilledUp = () => board.filter((child) => child == null).length;
+  const isBoardFilledUp = () =>
+    board.filter((child) => child == null).length == 0;
   const atLeastFiveCellsAreFilled = () =>
     board.filter((child) => child != null).length >= 5;
 
-  return { placeMark, getBoard, resetBoard, isBoardFilledUp };
+  const arrayOfFreeCellsPositions = () => {
+    const freeCellspositions = new Array();
+    let pos = -1;
+    while ((pos = board.indexOf(null, pos + 1)) != -1) {
+      freeCellspositions.push(pos);
+    }
+    return freeCellspositions;
+  };
+
+  return {
+    placeMark,
+    getBoard,
+    resetBoard,
+    isBoardFilledUp,
+    arrayOfFreeCellsPositions,
+  };
 })();
 
 function createPlayer(name, mark) {
@@ -50,6 +66,30 @@ function createPlayer(name, mark) {
   const toggleTurn = () => (isMyturn = !isMyturn);
 
   return { playAtPosition, getMark, getName, toggleTurn };
+}
+function createRobot(name = "Robot", mark = "O") {
+  let isMyturn = true;
+
+  const playAtRandomPosition = () => {
+    if (isMyturn) {
+      gameBoard.placeMark(
+        gameBoard.arrayOfFreeCellsPositions()[
+          parseInt(
+            Math.random() * gameBoard.arrayOfFreeCellsPositions().length - 1
+          )
+        ],
+        mark
+      );
+    } else {
+      console.log("Not your turn android!");
+      return;
+    }
+  };
+  const getMark = () => mark;
+  const getName = () => name;
+  const toggleTurn = () => (isMyturn = !isMyturn);
+
+  return { playAtRandomPosition, getMark, getName, toggleTurn };
 }
 
 function gameController(player1, player2) {
@@ -89,7 +129,7 @@ function gameController(player1, player2) {
 
       console.log(`${playersMark}:${winningPlayersName} wins!!!.`);
       gameBoard.resetBoard();
-    } else if (gameBoard.isBoardFilledUp() == 0) {
+    } else if (gameBoard.isBoardFilledUp()) {
       console.log("Game ended in a tie");
       gameBoard.resetBoard();
     }
@@ -103,6 +143,7 @@ function gameController(player1, player2) {
 }
 
 const player1 = createPlayer("John", "X");
-const player2 = createPlayer("Jane", "O");
+// const player2 = createPlayer("Jane", "O");
+const computer = createRobot();
 
-const controller = gameController(player1, player2);
+const controller = gameController(player1, computer);
