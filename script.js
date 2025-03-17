@@ -12,6 +12,9 @@ const gameBoard = (function () {
     } else {
       board[position] = playerMark;
       controller.setPlayerTurn();
+      console.log(
+        `${board[0]}, ${board[1]}, ${board[2]},\n${board[3]}, ${board[4]}, ${board[5]},\n ${board[6]}, ${board[7]}, ${board[8]}`
+      );
       console.log(board);
     }
     if (atLeastFiveCellsAreFilled()) {
@@ -32,7 +35,7 @@ const gameBoard = (function () {
   const atLeastFiveCellsAreFilled = () =>
     board.filter((child) => child != null).length >= 5;
 
-  const arrayOfFreeCellsPositions = () => {
+  const arrayOfFreeCells = () => {
     const freeCellspositions = new Array();
     let pos = -1;
     while ((pos = board.indexOf(null, pos + 1)) != -1) {
@@ -46,7 +49,7 @@ const gameBoard = (function () {
     getBoard,
     resetBoard,
     isBoardFilledUp,
-    arrayOfFreeCellsPositions,
+    arrayOfFreeCells,
   };
 })();
 
@@ -67,16 +70,15 @@ function createPlayer(name, mark) {
 
   return { playAtPosition, getMark, getName, toggleTurn };
 }
-function createRobot(name = "Robot", mark = "O") {
+function createRobot() {
+  const name = "Robot";
+  const mark = "O";
   let isMyturn = true;
-
   const playAtRandomPosition = () => {
     if (isMyturn) {
       gameBoard.placeMark(
-        gameBoard.arrayOfFreeCellsPositions()[
-          parseInt(
-            Math.random() * gameBoard.arrayOfFreeCellsPositions().length - 1
-          )
+        gameBoard.arrayOfFreeCells()[
+          parseInt(Math.random() * gameBoard.arrayOfFreeCells().length - 1)
         ],
         mark
       );
