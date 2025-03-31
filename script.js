@@ -1,8 +1,9 @@
 const gameBoard = (function () {
-  const board = [null, null, null, null, null, null, null, null, null];
+  const board = [null, null, null, "O", null, null, null, null, "X"];
+  const positionNames = ["topLeft","topCenter","topRight","centerLeft","center","centerRight","bottomLeft","bottomCenter","bottomRight"];
 
   const placeMark = function (position, playerMark) {
-    if (position > board.length - 1) {
+    if (position > board.length - 1 || position < 0) {
       console.log("Out of Bounds!!!");
       return;
     }
@@ -29,6 +30,8 @@ const gameBoard = (function () {
     getBoard();
   };
 
+  const getPositionsNames = () => positionNames;
+
   const getBoard = () => board;
   const isBoardFilledUp = () =>
     board.filter((child) => child == null).length == 0;
@@ -50,10 +53,11 @@ const gameBoard = (function () {
     resetBoard,
     isBoardFilledUp,
     arrayOfFreeCells,
+    getPositionsNames
   };
 })();
 
-function createPlayer(name, mark) {
+function createPlayer(name = "Human", mark = "X") {
   let isMyturn = true;
   const playAtPosition = (position) => {
     if (isMyturn) {
@@ -66,9 +70,10 @@ function createPlayer(name, mark) {
 
   const getMark = () => mark;
   const getName = () => name;
+  const getTurn = () => isMyturn;
   const toggleTurn = () => (isMyturn = !isMyturn);
 
-  return { playAtPosition, getMark, getName, toggleTurn };
+  return { playAtPosition, getMark, getName, getTurn, toggleTurn };
 }
 function createRobot() {
   const name = "Robot";
@@ -87,11 +92,20 @@ function createRobot() {
       return;
     }
   };
+
+  const setOfActions = () => {
+    return gameBoard.arrayOfFreeCells();
+  };
+
+  // const result = (board = gameBoard.getBoard(),position) => {
+  //   let newState =
+  // };
   const getMark = () => mark;
   const getName = () => name;
+  const getTurn = () => isMyturn;
   const toggleTurn = () => (isMyturn = !isMyturn);
 
-  return { playAtRandomPosition, getMark, getName, toggleTurn };
+  return { playAtRandomPosition, getMark, getName, getTurn, toggleTurn };
 }
 
 function gameController(player1, player2) {
@@ -144,8 +158,49 @@ function gameController(player1, player2) {
   return { checkWinner, setPlayerTurn };
 }
 
-const player1 = createPlayer("John", "X");
-// const player2 = createPlayer("Jane", "O");
+const human = createPlayer();
 const computer = createRobot();
 
-const controller = gameController(player1, computer);
+const controller = gameController(computer, human);
+
+//Initial state. Empty game board
+//PLAYER(s) => returns which player to move in state s
+const playerTomakeMove = (board = gameBoard.getBoard()) => {
+  if (board.filter((child) => child === null).length === board.length) {
+    return "X";
+  }
+  if (
+    board.filter((child) => child == "O").length == 1 &&
+    board.filter((child) => child == "X").length == 1
+  ) {
+    return "X";
+  }
+  if (
+    board.filter((child) => child == "X").length >
+    board.filter((child) => child == "O").length
+  ) {
+    return "O";
+  } else if (
+    board.filter((child) => child == "O").length >
+    board.filter((child) => child == "X").length
+  ) {
+    return "X";
+  }
+};
+//ACTIONS(s) => returns legal moves a player can make in state s
+const actions = () => {
+  let setOfActions = gameBoard.arrayOfFreeCells();
+  let playerMark = playerTomakeMove();
+
+  console.log(
+    `Player ${playerMark} can make a move in ${setOfActions.length} possible positions.`
+  );
+
+  for (const action of setOfActions) {
+    console.log(`At position ${action}: ${gameBoard.getPositionsNames()[action]}`);
+  }
+};
+//RESULT(s,a) => returns the state after action a taken in state s
+//TERMINAL(s) => checks if state s is a terminal state i.e a player wins or game ends in a tie
+//UTILITY(s) => final numerical value for terminal state s
+// playerTomakeMove();
