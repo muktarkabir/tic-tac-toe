@@ -105,7 +105,9 @@ function createRobot() {
 
   const playAtBestPositionAsMaximizer = () => {
     //check current state and see all actions that can be taken, i.e free cells and store them
-    aiMethods.actions(gameBoard.getBoard());
+    let possibleActions = aiMethods.actions();
+    console.log(possibleActions);
+    aiMethods.maxValue();
   };
 
   const getMark = () => mark;
@@ -125,28 +127,28 @@ function createRobot() {
 
 const aiMethods = (function () {
   //PLAYER(s) => returns which player to move in state s
-  const playerTomakeMove = (board) => {
+  const playerTomakeMove = (state) => {
     let mark;
     //When board is empty. It's X's turn because X is first player
-    if (board.filter((child) => child === null).length === board.length) {
+    if (state.filter((child) => child === null).length === state.length) {
       mark = "X";
     }
     //When both X and O have equal number of plays, following the logic of X being the first player it is X's turn to play
     if (
-      board.filter((child) => child == "O").length ==
-      board.filter((child) => child == "X").length
+      state.filter((child) => child == "O").length ==
+      state.filter((child) => child == "X").length
     ) {
       mark = "X";
     }
     //if X made more moves than O then it is O's turn
     if (
-      board.filter((child) => child == "X").length >
-      board.filter((child) => child == "O").length
+      state.filter((child) => child == "X").length >
+      state.filter((child) => child == "O").length
     ) {
       mark = "O";
     } else if (
-      board.filter((child) => child == "O").length >
-      board.filter((child) => child == "X").length
+      state.filter((child) => child == "O").length >
+      state.filter((child) => child == "X").length
     ) {
       mark = "X";
     }
@@ -154,71 +156,79 @@ const aiMethods = (function () {
     return mark;
   };
   //ACTIONS(s) => returns legal moves a player can make in state s
-  const actions = (board) => {
-    let setOfActions = gameBoard.arrayOfFreeCells();
-    let playerMark = playerTomakeMove(board);
+  const actions = (state) => {
+    let playerMark = playerTomakeMove(state);
+    const freeCellspositions = new Array();
+    let pos = -1;
+    while ((pos = state.indexOf(null, pos + 1)) != -1) {
+      freeCellspositions.push(pos);
+    }
 
     console.log(
-      `Player ${playerMark} can make a move in ${setOfActions.length} possible positions.`
+      `Player ${playerMark} can make a move in ${freeCellspositions.length} possible positions.`
     );
 
-    for (const action of setOfActions) {
+    for (const position of freeCellspositions) {
       console.log(
-        `At position ${action}: ${gameBoard.getPositionsNames()[action]}`
+        `At position ${position}: ${gameBoard.getPositionsNames()[position]}`
       );
       // result(action);
     }
+    return freeCellspositions;
   };
   //RESULT(s,a) => returns the state after action a taken in state s
-  const result = (action) => {
-    let board = Array.from(gameBoard.getBoard());
-    board[action] = playerTomakeMove();
+  const result = (state, action) => {
+    let newState = Array.from(state);
+    newState[action] = playerTomakeMove();
     console.log(
-      `${board[0]},${board[1]},${board[2]},\n${board[3]},${board[4]},${board[5]},\n${board[6]},${board[7]},${board[8]}`
+      `${newState[0]},${newState[1]},${newState[2]},\n${newState[3]},${newState[4]},${newState[5]},\n${newState[6]},${newState[7]},${newState[8]}`
     );
+    return newState;
   };
   //TERMINAL(s) => checks if state s is a terminal state i.e a player wins or game ends in a tie
-  const hasPlayerWon = (playersMark) => {
-    board = gameBoard.getBoard();
+  const hasPlayerWon = (state, playersMark) => {
     if (
-      (board[0] == playersMark &&
-        board[1] == playersMark &&
-        board[2] == playersMark) ||
-      (board[3] == playersMark &&
-        board[4] == playersMark &&
-        board[5] == playersMark) ||
-      (board[6] == playersMark &&
-        board[7] == playersMark &&
-        board[8] == playersMark) ||
-      (board[0] == playersMark &&
-        board[3] == playersMark &&
-        board[6] == playersMark) ||
-      (board[1] == playersMark &&
-        board[4] == playersMark &&
-        board[7] == playersMark) ||
-      (board[2] == playersMark &&
-        board[5] == playersMark &&
-        board[8] == playersMark) ||
-      (board[0] == playersMark &&
-        board[4] == playersMark &&
-        board[8] == playersMark) ||
-      (board[2] == playersMark &&
-        board[4] == playersMark &&
-        board[6] == playersMark)
+      (state[0] == playersMark &&
+        state[1] == playersMark &&
+        state[2] == playersMark) ||
+      (state[3] == playersMark &&
+        state[4] == playersMark &&
+        state[5] == playersMark) ||
+      (state[6] == playersMark &&
+        state[7] == playersMark &&
+        state[8] == playersMark) ||
+      (state[0] == playersMark &&
+        state[3] == playersMark &&
+        state[6] == playersMark) ||
+      (state[1] == playersMark &&
+        state[4] == playersMark &&
+        state[7] == playersMark) ||
+      (state[2] == playersMark &&
+        state[5] == playersMark &&
+        state[8] == playersMark) ||
+      (state[0] == playersMark &&
+        state[4] == playersMark &&
+        state[8] == playersMark) ||
+      (state[2] == playersMark &&
+        state[4] == playersMark &&
+        state[6] == playersMark)
     ) {
       return true;
     } else {
       return false;
     }
   };
-  const terminalState = () => {
-    if (gameBoard.isBoardFilledUp()) {
+  const isFilledUp = (state) =>
+    state.filter((child) => child == null).length == 0;
+
+  const terminalState = (state) => {
+    if (isFilledUp(state)) {
       console.log("Game is over");
       return true;
-    } else if (hasPlayerWon("X")) {
+    } else if (hasPlayerWon(state, "X")) {
       console.log("X wins");
       return true;
-    } else if (hasPlayerWon("O")) {
+    } else if (hasPlayerWon(state, "O")) {
       console.log("O wins");
       return true;
     } else {
@@ -227,42 +237,41 @@ const aiMethods = (function () {
   };
   //UTILITY(s) => final numerical value for terminal state s
 
-  const gameUtility = () => {
-    if (checkWinner("X")) {
+  const gameUtility = (state) => {
+    if (hasPlayerWon(state, "X")) {
       return 1;
-    } else if (checkWinner("O")) {
+    } else if (hasPlayerWon(state, "O")) {
       return -1;
-    } else if (gameBoard.isBoardFilledUp()) {
+    } else if (isFilledUp(state)) {
       return 0;
     }
   };
 
   //max-value implementation. This function checks the current state of the game board and
 
-  const maxValue = () => {
-    if (terminalState()) {
-      return gameUtility();
+  const maxValue = (state) => {
+    if (terminalState(state)) {
+      return gameUtility(state);
     }
-
     let value = -Infinity;
-
-    for (const action of actions()) {
-      value = Math.max(v, minValue(result(action)));
+    for (const action of actions(state)) {
+      value = Math.max(value, minValue(result(state,action)));
+      console.log(value);
       return value;
     }
   };
 
   //min-value implementation
 
-  const minValue = () => {
-    if (terminalState()) {
-      return gameUtility();
+  const minValue = (state) => {
+    if (terminalState(state)) {
+      return gameUtility(state);
     }
 
     let value = Infinity;
 
-    for (const action of actions()) {
-      value = Math.min(v, maxValue(result(action)));
+    for (const action of actions(state)) {
+      value = Math.min(value, maxValue(result(state, action)));
       return value;
     }
   };
