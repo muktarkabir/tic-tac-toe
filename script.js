@@ -131,7 +131,7 @@ const aiMethods = (function () {
     if (board.filter((child) => child === null).length === board.length) {
       mark = "X";
     }
-    //When both X and O have played exactly once, it is X's turn
+    //When both X and O have equal number of plays, following the logic of X being the first player it is X's turn to play
     if (
       board.filter((child) => child == "O").length ==
       board.filter((child) => child == "X").length
