@@ -1,5 +1,6 @@
 const gameBoard = (function () {
   const board = [null, "X", "O", "O", "X", null, "X", null, "O"];
+  // const board = [null,null,null,null,null,null,null,null,null];
   const positionNames = [
     "topLeft",
     "topCenter",
@@ -103,11 +104,16 @@ function createRobot() {
     }
   };
 
-  const playAtBestPositionAsMaximizer = () => {
+  const playAtBestPositionAsMaximizer = (state) => {
     //check current state and see all actions that can be taken, i.e free cells and store them
-    let possibleActions = aiMethods.actions();
-    console.log(possibleActions);
-    aiMethods.maxValue();
+    console.log("Calculating best play...");
+    let arrayOfUtilities = aiMethods.maxValue(state);
+    // for (const action of possibleActions) {
+    //   console.log(aiMethods.result(state, action));
+    // }
+
+    console.log(arrayOfUtilities);
+    console.log(aiMethods.actions(state));
   };
 
   const getMark = () => mark;
@@ -128,9 +134,11 @@ function createRobot() {
 const aiMethods = (function () {
   //PLAYER(s) => returns which player to move in state s
   const playerTomakeMove = (state) => {
+    // console.log("Current State", state);
+
     let mark;
     //When board is empty. It's X's turn because X is first player
-    if (state.filter((child) => child === null).length === state.length) {
+    if (state.filter((child) => child == null).length == state.length) {
       mark = "X";
     }
     //When both X and O have equal number of plays, following the logic of X being the first player it is X's turn to play
@@ -172,14 +180,14 @@ const aiMethods = (function () {
       console.log(
         `At position ${position}: ${gameBoard.getPositionsNames()[position]}`
       );
-      // result(action);
+      // result(state,position);
     }
     return freeCellspositions;
   };
   //RESULT(s,a) => returns the state after action a taken in state s
   const result = (state, action) => {
     let newState = Array.from(state);
-    newState[action] = playerTomakeMove();
+    newState[action] = playerTomakeMove(state);
     console.log(
       `${newState[0]},${newState[1]},${newState[2]},\n${newState[3]},${newState[4]},${newState[5]},\n${newState[6]},${newState[7]},${newState[8]}`
     );
@@ -221,8 +229,13 @@ const aiMethods = (function () {
   const isFilledUp = (state) =>
     state.filter((child) => child == null).length == 0;
 
+  // const isEmpty = (state) =>
+  //   state.filter((child) => child == null).length == state.length;
+
   const terminalState = (state) => {
-    if (isFilledUp(state)) {
+    // console.log("Current State", state);
+
+    if (state.filter((child) => child == null).length == 0) {
       console.log("Game is over");
       return true;
     } else if (hasPlayerWon(state, "X")) {
@@ -247,18 +260,25 @@ const aiMethods = (function () {
     }
   };
 
-  //max-value implementation. This function checks the current state of the game board and
+  //This function checks the current state of the board and returns the best move the player can make in the situation.
 
   const maxValue = (state) => {
     if (terminalState(state)) {
       return gameUtility(state);
     }
     let value = -Infinity;
+    let values = [];
     for (const action of actions(state)) {
-      value = Math.max(value, minValue(result(state,action)));
-      console.log(value);
-      return value;
+      value = Math.max(value, minValue(result(state, action)));
+      values.push(value);
+      console.log(
+        `The value of this board when played at ${action} is ${value}`
+      );
     }
+    // console.log(actions(state));
+    // console.log(values);
+
+    return values;
   };
 
   //min-value implementation
@@ -272,8 +292,8 @@ const aiMethods = (function () {
 
     for (const action of actions(state)) {
       value = Math.min(value, maxValue(result(state, action)));
-      return value;
     }
+    return value;
   };
 
   return {
