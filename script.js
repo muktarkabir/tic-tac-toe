@@ -1,5 +1,5 @@
 const gameBoard = (function () {
-  const board = [null, "X", "O", "O", "X", null, "X", null, "O"];
+  const board = [null, "X", "O", "O", null, null, "X", null, null];
   // const board = [null,null,null,null,null,null,null,null,null];
   const positionNames = [
     "topLeft",
@@ -68,7 +68,7 @@ const gameBoard = (function () {
   };
 })();
 
-function createPlayer(name = "Human", mark = "X") {
+function createPlayer(name = "Human", mark = "O") {
   let isMyturn = true;
   const playAtPosition = (position) => {
     if (isMyturn) {
@@ -88,7 +88,7 @@ function createPlayer(name = "Human", mark = "X") {
 }
 function createRobot() {
   const name = "Robot";
-  const mark = "O";
+  const mark = "X";
   let isMyturn = true;
   const playAtRandomPosition = () => {
     if (isMyturn) {
@@ -105,18 +105,29 @@ function createRobot() {
   };
 
   const playAtBestPositionAsMaximizer = (state) => {
-    //check current state and see all actions that can be taken, i.e free cells and store them
-    console.log("Calculating best play...");
-    let arrayOfUtilities = aiMethods.maxValue(state);
-    // for (const action of possibleActions) {
-    //   console.log(aiMethods.result(state, action));
-    // }
-
-    console.log(arrayOfUtilities);
-    console.log(aiMethods.actions(state));
-
-    console.log(`The best position to play is ${aiMethods.actions(state)[getIndexOfBestValue(arrayOfUtilities)]}: ${gameBoard.getPositionsNames()[getIndexOfBestValue(arrayOfUtilities)]} `);
-    
+    if (isMyturn) {
+      //check current state and see all actions that can be taken, i.e free cells and store them
+      console.log("Calculating best play...");
+      console.log(
+        `The best position to play is ${
+          aiMethods.actions(state)[
+            getIndexOfBestValue(aiMethods.maxValue(state))
+          ]
+        }: ${
+          gameBoard.getPositionsNames()[
+            getIndexOfBestValue(aiMethods.maxValue(state))
+          ]
+        } `
+      );
+      let bestAction =
+        aiMethods.actions(state)[
+          getIndexOfBestValue(aiMethods.maxValue(state))
+        ];
+      gameBoard.placeMark(bestAction, mark);
+    } else {
+      console.log("Not your turn android!");
+      return;
+    }
   };
 
   const getIndexOfBestValue = (array) => {
@@ -141,7 +152,7 @@ function createRobot() {
     getTurn,
     toggleTurn,
     playAtBestPositionAsMaximizer,
-    getIndexOfBestValue
+    getIndexOfBestValue,
   };
 }
 
@@ -243,13 +254,10 @@ const aiMethods = (function () {
   const isFilledUp = (state) =>
     state.filter((child) => child == null).length == 0;
 
-  // const isEmpty = (state) =>
-  //   state.filter((child) => child == null).length == state.length;
-
   const terminalState = (state) => {
     // console.log("Current State", state);
 
-    if (state.filter((child) => child == null).length == 0) {
+    if ((state.filter((child) => child == null).length == 0)&& !hasPlayerWon(state,"X") && !hasPlayerWon(state,"O")) {
       console.log("Game is over");
       return true;
     } else if (hasPlayerWon(state, "X")) {
@@ -284,13 +292,15 @@ const aiMethods = (function () {
     let values = [];
     for (const action of actions(state)) {
       value = Math.max(value, minValue(result(state, action)));
+      console.log(value);
+      
       values.push(value);
       console.log(
         `The value of this board when played at ${action} is ${value}`
       );
     }
     // console.log(actions(state));
-    // console.log(values);
+    console.log(values);
 
     return values;
   };
@@ -303,9 +313,10 @@ const aiMethods = (function () {
     }
 
     let value = Infinity;
-
+    let values = [];
     for (const action of actions(state)) {
       value = Math.min(value, maxValue(result(state, action)));
+      values.push(value);
     }
     return value;
   };
