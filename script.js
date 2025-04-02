@@ -114,6 +114,19 @@ function createRobot() {
 
     console.log(arrayOfUtilities);
     console.log(aiMethods.actions(state));
+
+    console.log(`The best position to play is ${aiMethods.actions(state)[getIndexOfBestValue(arrayOfUtilities)]}: ${gameBoard.getPositionsNames()[getIndexOfBestValue(arrayOfUtilities)]} `);
+    
+  };
+
+  const getIndexOfBestValue = (array) => {
+    let indexOfBestOption = 0;
+    for (let element = 1; element < array.length; element++) {
+      if (array[element] > array[indexOfBestOption]) {
+        indexOfBestOption = element;
+      }
+    }
+    return indexOfBestOption;
   };
 
   const getMark = () => mark;
@@ -128,6 +141,7 @@ function createRobot() {
     getTurn,
     toggleTurn,
     playAtBestPositionAsMaximizer,
+    getIndexOfBestValue
   };
 }
 
