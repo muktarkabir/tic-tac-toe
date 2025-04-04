@@ -1,6 +1,5 @@
 const gameBoard = (function () {
-  // const board = ["O", "X", "O", "O", "X", "X", "X", null, "O"];
-  const board = ["X", null, null, null, null, null, null, null, null];
+  const board = [null, null, null, null, null, null, null, null, null];
   const positionNames = [
     "topLeft",
     "topCenter",
@@ -58,6 +57,9 @@ const gameBoard = (function () {
     return freeCellspositions;
   };
 
+  const gameBoardIsEmpty = () =>
+    board.filter((child) => child == null).length == board.length;
+
   return {
     placeMark,
     getBoard,
@@ -65,10 +67,11 @@ const gameBoard = (function () {
     isBoardFilledUp,
     arrayOfFreeCells,
     getPositionsNames,
+    gameBoardIsEmpty,
   };
 })();
 
-function createPlayer(name = "Human", mark = "O") {
+function createHumanPlayer(name, mark = "O") {
   let isMyturn = true;
   const playAtPosition = (position) => {
     if (isMyturn) {
@@ -86,8 +89,10 @@ function createPlayer(name = "Human", mark = "O") {
 
   return { playAtPosition, getMark, getName, getTurn, toggleTurn };
 }
-function createRobot(mark = "X", isMyturn = true) {
+function createRobot() {
   const name = "Robot";
+  const mark = "X";
+  let isMyturn = true;
   const playAtRandomPosition = () => {
     if (isMyturn) {
       gameBoard.placeMark(
@@ -106,18 +111,23 @@ function createRobot(mark = "X", isMyturn = true) {
     if (isMyturn) {
       //check current state and see all actions that can be taken, i.e free cells and store them
       console.log("Calculating best play...");
-      let bestAction =
-        aiMethods.actions(state)[
-          getIndexOfBestValue(aiMethods.maxValue(state,true))
-        ];
-      console.log(
-        `The best position to play is ${bestAction}: ${
-          gameBoard.getPositionsNames()[bestAction]
-        } for player ${mark}`
-      );
-      console.log("E N D O F S I M U L A T I O N");
+      if (gameBoard.gameBoardIsEmpty()) {
+        //manually playing the first move for performance issues
+        gameBoard.placeMark(0, mark);
+      } else {
+        let bestAction =
+          aiMethods.actions(state)[
+            getIndexOfBestValue(aiMethods.maxValue(state, true))
+          ];
+        console.log(
+          `The best position to play is ${bestAction}: ${
+            gameBoard.getPositionsNames()[bestAction]
+          } for player ${mark}`
+        );
+        console.log("END OF SIMULATION");
 
-      gameBoard.placeMark(bestAction, mark);
+        gameBoard.placeMark(bestAction, mark);
+      }
     } else {
       console.log("Not your turn android!");
       return;
@@ -197,7 +207,6 @@ const aiMethods = (function () {
       console.log(
         `At position ${position}: ${gameBoard.getPositionsNames()[position]}`
       );
-      // result(state,position);
     }
     return freeCellspositions;
   };
@@ -389,8 +398,6 @@ function gameController(player1, player2) {
   return { checkWinner, setPlayerTurn };
 }
 
-const human = createPlayer();
+const human = createHumanPlayer("Usman");
 const computer = createRobot();
-const android = createRobot("O");
-
 const controller = gameController(computer, human);
