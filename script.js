@@ -1,6 +1,6 @@
 const gameBoard = (function () {
-  const board = [null, "X", "O", "O", null, null, "X", null, null];
-  // const board = [null,null,null,null,null,null,null,null,null];
+  // const board = ["O", "X", "O", "O", "X", "X", "X", null, "O"];
+  const board = ["X", null, null, null, null, null, null, null, null];
   const positionNames = [
     "topLeft",
     "topCenter",
@@ -86,10 +86,8 @@ function createPlayer(name = "Human", mark = "O") {
 
   return { playAtPosition, getMark, getName, getTurn, toggleTurn };
 }
-function createRobot() {
+function createRobot(mark = "X", isMyturn = true) {
   const name = "Robot";
-  const mark = "X";
-  let isMyturn = true;
   const playAtRandomPosition = () => {
     if (isMyturn) {
       gameBoard.placeMark(
@@ -104,25 +102,21 @@ function createRobot() {
     }
   };
 
-  const playAtBestPositionAsMaximizer = (state) => {
+  const playAtBestPosition = (state) => {
     if (isMyturn) {
       //check current state and see all actions that can be taken, i.e free cells and store them
       console.log("Calculating best play...");
-      console.log(
-        `The best position to play is ${
-          aiMethods.actions(state)[
-            getIndexOfBestValue(aiMethods.maxValue(state))
-          ]
-        }: ${
-          gameBoard.getPositionsNames()[
-            getIndexOfBestValue(aiMethods.maxValue(state))
-          ]
-        } `
-      );
       let bestAction =
         aiMethods.actions(state)[
-          getIndexOfBestValue(aiMethods.maxValue(state))
+          getIndexOfBestValue(aiMethods.maxValue(state,true))
         ];
+      console.log(
+        `The best position to play is ${bestAction}: ${
+          gameBoard.getPositionsNames()[bestAction]
+        } for player ${mark}`
+      );
+      console.log("E N D O F S I M U L A T I O N");
+
       gameBoard.placeMark(bestAction, mark);
     } else {
       console.log("Not your turn android!");
@@ -151,7 +145,7 @@ function createRobot() {
     getName,
     getTurn,
     toggleTurn,
-    playAtBestPositionAsMaximizer,
+    playAtBestPosition,
     getIndexOfBestValue,
   };
 }
@@ -159,8 +153,6 @@ function createRobot() {
 const aiMethods = (function () {
   //PLAYER(s) => returns which player to move in state s
   const playerTomakeMove = (state) => {
-    // console.log("Current State", state);
-
     let mark;
     //When board is empty. It's X's turn because X is first player
     if (state.filter((child) => child == null).length == state.length) {
@@ -214,6 +206,11 @@ const aiMethods = (function () {
     let newState = Array.from(state);
     newState[action] = playerTomakeMove(state);
     console.log(
+      "R E S U L T I N G S T A T E " +
+        `as player ${playerTomakeMove(state)} plays.`
+    );
+
+    console.log(
       `${newState[0]},${newState[1]},${newState[2]},\n${newState[3]},${newState[4]},${newState[5]},\n${newState[6]},${newState[7]},${newState[8]}`
     );
     return newState;
@@ -257,7 +254,11 @@ const aiMethods = (function () {
   const terminalState = (state) => {
     // console.log("Current State", state);
 
-    if ((state.filter((child) => child == null).length == 0)&& !hasPlayerWon(state,"X") && !hasPlayerWon(state,"O")) {
+    if (
+      state.filter((child) => child == null).length == 0 &&
+      !hasPlayerWon(state, "X") &&
+      !hasPlayerWon(state, "O")
+    ) {
       console.log("Game is over");
       return true;
     } else if (hasPlayerWon(state, "X")) {
@@ -271,7 +272,6 @@ const aiMethods = (function () {
     }
   };
   //UTILITY(s) => final numerical value for terminal state s
-
   const gameUtility = (state) => {
     if (hasPlayerWon(state, "X")) {
       return 1;
@@ -284,25 +284,29 @@ const aiMethods = (function () {
 
   //This function checks the current state of the board and returns the best move the player can make in the situation.
 
-  const maxValue = (state) => {
+  const maxValue = (state, returnArray = false) => {
     if (terminalState(state)) {
       return gameUtility(state);
     }
     let value = -Infinity;
     let values = [];
     for (const action of actions(state)) {
+      console.log(
+        `Player ${playerTomakeMove(state)} Playing at position ${action}`
+      );
+
       value = Math.max(value, minValue(result(state, action)));
       console.log(value);
-      
+
       values.push(value);
       console.log(
         `The value of this board when played at ${action} is ${value}`
       );
     }
     // console.log(actions(state));
-    console.log(values);
+    // console.log(values);
 
-    return values;
+    return returnArray ? values : value;
   };
 
   //min-value implementation
@@ -313,10 +317,13 @@ const aiMethods = (function () {
     }
 
     let value = Infinity;
-    let values = [];
+    // let values = [];
     for (const action of actions(state)) {
+      console.log(
+        `Player ${playerTomakeMove(state)} Playing at position ${action}`
+      );
       value = Math.min(value, maxValue(result(state, action)));
-      values.push(value);
+      // values.push(value);
     }
     return value;
   };
@@ -384,5 +391,6 @@ function gameController(player1, player2) {
 
 const human = createPlayer();
 const computer = createRobot();
+const android = createRobot("O");
 
 const controller = gameController(computer, human);
