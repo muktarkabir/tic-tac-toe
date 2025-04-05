@@ -254,9 +254,8 @@ const aiMethods = (function () {
     return newState;
   };
   //TERMINAL(s) => checks if state s is a terminal state i.e a player wins or game ends in a tie
-  const hasPlayerWon = (state, playersMark) => {
-    return gameBoard.satisfiesWinningConditions(state, playersMark);
-  };
+  const hasPlayerWon = (state, playersMark) =>
+    gameBoard.satisfiesWinningConditions(state, playersMark);
   const isFilledUp = (state) =>
     state.filter((child) => child == null).length == 0;
 
