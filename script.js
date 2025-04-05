@@ -1,5 +1,5 @@
 const gameBoard = (function () {
-  const board = [null, null, null, null, null, null, null, null, null];
+  const board = Array(9).fill(null);
   const positionNames = [
     "topLeft",
     "topCenter",
@@ -33,12 +33,7 @@ const gameBoard = (function () {
     }
   };
 
-  const resetBoard = () => {
-    for (let i = 0; i < board.length; i++) {
-      board[i] = null;
-    }
-    getBoard();
-  };
+  const resetBoard = () => board.fill(null);
 
   const getPositionsNames = () => positionNames;
 
@@ -60,6 +55,39 @@ const gameBoard = (function () {
   const gameBoardIsEmpty = () =>
     board.filter((child) => child == null).length == board.length;
 
+  const satisfiesWinningConditions = (state, playersMark) => {
+    if (
+      (state[0] == playersMark &&
+        state[1] == playersMark &&
+        state[2] == playersMark) ||
+      (state[3] == playersMark &&
+        state[4] == playersMark &&
+        state[5] == playersMark) ||
+      (state[6] == playersMark &&
+        state[7] == playersMark &&
+        state[8] == playersMark) ||
+      (state[0] == playersMark &&
+        state[3] == playersMark &&
+        state[6] == playersMark) ||
+      (state[1] == playersMark &&
+        state[4] == playersMark &&
+        state[7] == playersMark) ||
+      (state[2] == playersMark &&
+        state[5] == playersMark &&
+        state[8] == playersMark) ||
+      (state[0] == playersMark &&
+        state[4] == playersMark &&
+        state[8] == playersMark) ||
+      (state[2] == playersMark &&
+        state[4] == playersMark &&
+        state[6] == playersMark)
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   return {
     placeMark,
     getBoard,
@@ -68,6 +96,7 @@ const gameBoard = (function () {
     arrayOfFreeCells,
     getPositionsNames,
     gameBoardIsEmpty,
+    satisfiesWinningConditions,
   };
 })();
 
@@ -226,36 +255,7 @@ const aiMethods = (function () {
   };
   //TERMINAL(s) => checks if state s is a terminal state i.e a player wins or game ends in a tie
   const hasPlayerWon = (state, playersMark) => {
-    if (
-      (state[0] == playersMark &&
-        state[1] == playersMark &&
-        state[2] == playersMark) ||
-      (state[3] == playersMark &&
-        state[4] == playersMark &&
-        state[5] == playersMark) ||
-      (state[6] == playersMark &&
-        state[7] == playersMark &&
-        state[8] == playersMark) ||
-      (state[0] == playersMark &&
-        state[3] == playersMark &&
-        state[6] == playersMark) ||
-      (state[1] == playersMark &&
-        state[4] == playersMark &&
-        state[7] == playersMark) ||
-      (state[2] == playersMark &&
-        state[5] == playersMark &&
-        state[8] == playersMark) ||
-      (state[0] == playersMark &&
-        state[4] == playersMark &&
-        state[8] == playersMark) ||
-      (state[2] == playersMark &&
-        state[4] == playersMark &&
-        state[6] == playersMark)
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    return gameBoard.satisfiesWinningConditions(state, playersMark);
   };
   const isFilledUp = (state) =>
     state.filter((child) => child == null).length == 0;
@@ -352,42 +352,17 @@ function gameController(player1, player2) {
   player2.toggleTurn();
   const board = gameBoard.getBoard();
   const checkWinner = (playersMark) => {
-    if (
-      (board[0] == playersMark &&
-        board[1] == playersMark &&
-        board[2] == playersMark) ||
-      (board[3] == playersMark &&
-        board[4] == playersMark &&
-        board[5] == playersMark) ||
-      (board[6] == playersMark &&
-        board[7] == playersMark &&
-        board[8] == playersMark) ||
-      (board[0] == playersMark &&
-        board[3] == playersMark &&
-        board[6] == playersMark) ||
-      (board[1] == playersMark &&
-        board[4] == playersMark &&
-        board[7] == playersMark) ||
-      (board[2] == playersMark &&
-        board[5] == playersMark &&
-        board[8] == playersMark) ||
-      (board[0] == playersMark &&
-        board[4] == playersMark &&
-        board[8] == playersMark) ||
-      (board[2] == playersMark &&
-        board[4] == playersMark &&
-        board[6] == playersMark)
-    ) {
+    if (gameBoard.satisfiesWinningConditions(board, playersMark)) {
       const winningPlayersName =
         player1.getMark() == playersMark
           ? player1.getName()
           : player2.getName();
 
       console.log(`${playersMark}:${winningPlayersName} wins!!!.`);
-      // gameBoard.resetBoard();
+      gameBoard.resetBoard();
     } else if (gameBoard.isBoardFilledUp()) {
       console.log("Game ended in a tie");
-      // gameBoard.resetBoard();
+      gameBoard.resetBoard();
     }
   };
   const setPlayerTurn = () => {
