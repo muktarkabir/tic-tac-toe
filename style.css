@@ -21,6 +21,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   padding-top: 40px;
 }
 
@@ -47,4 +48,27 @@ main {
       }
     }
   }
+}
+
+.game-board{
+    margin-top: 60px;
+    align-self: center;
+    display: grid;
+    grid-template-columns: repeat(3,100px);
+    grid-auto-rows: 100px;
+    place-items: center;
+    gap: 4px;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    border: var(--border);
+    box-shadow: var(--min-box-shadow);
+
+
+    & .cell{
+        /* outline: 1px solid black; */
+        height: 100px;
+        width: 100px;
+        background-color: rgb(231, 231, 231);
+        border-radius: inherit;
+    }
 }
