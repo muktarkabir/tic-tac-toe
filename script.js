@@ -135,6 +135,7 @@ function createRobot() {
   const name = "Robot";
   const mark = "X";
   let isMyturn = true;
+  let score = 0;
   const playAtRandomPosition = () => {
     if (isMyturn) {
       gameBoard.placeMark(
@@ -190,6 +191,9 @@ function createRobot() {
   const getName = () => name;
   const getTurn = () => isMyturn;
   const toggleTurn = () => (isMyturn = !isMyturn);
+  const increaseScore = () => score++;
+  const getScore = () => score;
+  const resetScore = () => (score = 0);
 
   return {
     playAtRandomPosition,
@@ -199,6 +203,9 @@ function createRobot() {
     toggleTurn,
     playAtBestPosition,
     getIndexOfBestValue,
+    increaseScore,
+    getScore,
+    resetScore,
   };
 }
 
