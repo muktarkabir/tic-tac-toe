@@ -102,6 +102,7 @@ const gameBoard = (function () {
 
 function createHumanPlayer(name, mark = "O") {
   let isMyturn = true;
+  let score = 0;
   const playAtPosition = (position) => {
     if (isMyturn) {
       gameBoard.placeMark(position, mark);
@@ -115,8 +116,20 @@ function createHumanPlayer(name, mark = "O") {
   const getName = () => name;
   const getTurn = () => isMyturn;
   const toggleTurn = () => (isMyturn = !isMyturn);
+  const increaseScore = () => score++;
+  const getScore = () => score;
+  const resetScore = () => (score = 0);
 
-  return { playAtPosition, getMark, getName, getTurn, toggleTurn };
+  return {
+    playAtPosition,
+    getMark,
+    getName,
+    getTurn,
+    toggleTurn,
+    increaseScore,
+    getScore,
+    resetScore,
+  };
 }
 function createRobot() {
   const name = "Robot";
@@ -348,6 +361,8 @@ const aiMethods = (function () {
 })();
 
 function gameController(player1, player2) {
+  let numberOfGames = 3;
+  let numberOfDraws = 0;
   player2.toggleTurn();
   const board = gameBoard.getBoard();
   const checkWinner = (playersMark) => {
@@ -356,13 +371,47 @@ function gameController(player1, player2) {
         player1.getMark() == playersMark
           ? player1.getName()
           : player2.getName();
-
-      console.log(`${playersMark}:${winningPlayersName} wins!!!.`);
+      player1.getMark() == playersMark
+        ? player1.increaseScore()
+        : player2.increaseScore();
+      console.log(`${playersMark}:${winningPlayersName} wins this round!!!.`);
+      numberOfGames--;
+      if (numberOfGames == 0) annouceWinner();
       gameBoard.resetBoard();
     } else if (gameBoard.isBoardFilledUp()) {
       console.log("Game ended in a tie");
+      numberOfDraws++;
+      numberOfGames--;
+      if (numberOfGames == 0) annouceWinner();
       gameBoard.resetBoard();
     }
+  };
+
+  const annouceWinner = () => {
+    console.log("----------FINAL SCORES----------");
+    console.log(`${player1.getMark()} Player's Score: ${player1.getScore()}`);
+    console.log(`${player2.getMark()} Player's Score: ${player2.getScore()}`);
+    console.log(`${numberOfDraws} Draws.`);
+    if (player1.getScore() > player2.getScore()) {
+      console.log(
+        `The winner is ${player1.getMark()} player: ${player1.getName()}`
+      );
+    } else if (player2.getScore() > player1.getScore()) {
+      console.log(
+        `The winner is ${player2.getMark()} player: ${player2.getName()}`
+      );
+    } else {
+      console.log("Game Ended in a Draw!!");
+    }
+
+    resetGame();
+  };
+  const resetGame = () => {
+    player1.resetScore();
+    player2.resetScore();
+    gameBoard.resetBoard();
+    numberOfDraws = 0;
+    numberOfGames = 3;
   };
   const setPlayerTurn = () => {
     player1.toggleTurn();
@@ -372,6 +421,7 @@ function gameController(player1, player2) {
   return { checkWinner, setPlayerTurn };
 }
 
-const human = createHumanPlayer("Usman");
+const usman = createHumanPlayer("Usman");
+const john = createHumanPlayer("John", "X");
 const computer = createRobot();
-const controller = gameController(computer, human);
+const controller = gameController(usman, john);
