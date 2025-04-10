@@ -10,40 +10,51 @@
   </head>
   <body>
     <main>
-      <div class="score-board">
-        <h2 class="title">Score Board</h2>
-        <div class="stats">
-          <div class="x-player-score">
-            <h4>X Player</h4>
-            <h1>0</h1>
+      <div class="window">
+        <div class="game">
+          <div class="score-board">
+            <h2 class="title">Score Board</h2>
+            <div class="stats">
+              <div class="x-player-score">
+                <h4>X Player</h4>
+                <h1>0</h1>
+              </div>
+              <div class="draw-count">
+                <h4>Draws</h4>
+                <h1>0</h1>
+              </div>
+              <div class="o-player-score">
+                <h4>O Player</h4>
+                <h1>0</h1>
+              </div>
+            </div>
           </div>
-          <div class="draw-count">
-            <h4>Draws</h4>
-            <h1>0</h1>
+          <div class="game-board">
+            <div data-index="0" class="cell"></div>
+            <div data-index="1" class="cell"></div>
+            <div data-index="2" class="cell"></div>
+            <div data-index="3" class="cell"></div>
+            <div data-index="4" class="cell"></div>
+            <div data-index="5" class="cell"></div>
+            <div data-index="6" class="cell"></div>
+            <div data-index="7" class="cell"></div>
+            <div data-index="8" class="cell"></div>
           </div>
-          <div class="o-player-score">
-            <h4>O Player</h4>
-            <h1>0</h1>
+          <div class="controls">
+            <div class="reset-quit">
+              <button type="button" class="quit">Quit</button>
+              <button type="button" class="reset">Reset</button>
+            </div>
+            <button type="button" class="start">Start</button>
           </div>
         </div>
-      </div>
-      <div class="game-board">
-        <div data-index="0" class="cell"></div>
-        <div data-index="1" class="cell"></div>
-        <div data-index="2" class="cell"></div>
-        <div data-index="3" class="cell"></div>
-        <div data-index="4" class="cell"></div>
-        <div data-index="5" class="cell"></div>
-        <div data-index="6" class="cell"></div>
-        <div data-index="7" class="cell"></div>
-        <div data-index="8" class="cell"></div>
-      </div>
-      <div class="controls">
-        <div class="reset-quit">
-          <button type="button" class="quit">Quit</button>
-          <button type="button" class="reset">Reset</button>
+        <div class="versus-dialog">
+          <input type="checkbox" name="toggle" id="dialogs" />
+          <div class="vs-human-and-ai">
+            <div class="vs-human"></div>
+            <div class="vs-ai"></div>
+          </div>
         </div>
-        <button type="button" class="start">Start</button>
       </div>
     </main>
   </body>

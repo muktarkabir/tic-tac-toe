@@ -432,3 +432,17 @@ const usman = createHumanPlayer("Usman");
 const john = createHumanPlayer("John", "X");
 const computer = createRobot();
 const controller = gameController(usman, john);
+
+document.querySelector(".start").addEventListener("click", () => {
+  moveGameOffScreen();
+});
+
+function moveGameOffScreen() {
+  const game = document.querySelector(".window");
+  const versusDialogs = document.querySelector(".versus-dialog");
+  game.style.transform = `translateX(${-100}%)`;
+  game.style.transition = `transform .3s ease-in`;
+  // versusDialogs.style.transform = `translateX(${-120}%)`;
+  // versusDialogs.style.transition = `transform .3s ease-in`;
+}
+
