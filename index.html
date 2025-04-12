@@ -100,3 +100,17 @@
     </main>
   </body>
 </html>
+
+<script>
+  const humanNumberComponent =
+    document.querySelectorAll(".number-component")[0];
+  const humanMinusButton = humanNumberComponent.querySelectorAll("img")[0];
+  const humanAddButton = humanNumberComponent.querySelectorAll("img")[1];
+  const humanNumber = humanNumberComponent.querySelector("p");
+
+  humanMinusButton.addEventListener("click", () => {
+    if (parseInt(humanNumber.textContent) > 1) {
+      humanNumber.innerText = `${parseInt(humanNumber.textContent) - 1}`;
+    }
+  });
+</script>
