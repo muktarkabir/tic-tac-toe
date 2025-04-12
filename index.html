@@ -102,11 +102,15 @@
 </html>
 
 <script>
-  const humanNumberComponent =
-    document.querySelectorAll(".number-component")[0];
+  const numberComponent = document.querySelectorAll(".number-component");
+  const humanNumberComponent = numberComponent[0];
+  const aiNumberComponent = numberComponent[1];
   const humanMinusButton = humanNumberComponent.querySelectorAll("img")[0];
   const humanAddButton = humanNumberComponent.querySelectorAll("img")[1];
   const humanNumber = humanNumberComponent.querySelector("p");
+  const aiMinusButton = aiNumberComponent.querySelectorAll("img")[0];
+  const aiAddButton = aiNumberComponent.querySelectorAll("img")[1];
+  const aiNumber = aiNumberComponent.querySelector("p");
 
   humanMinusButton.addEventListener("click", () => {
     if (parseInt(humanNumber.textContent) > 1) {
@@ -117,6 +121,18 @@
   humanAddButton.addEventListener("click", () => {
     if (parseInt(humanNumber.textContent) < 10) {
       humanNumber.innerText = `${parseInt(humanNumber.textContent) + 1}`;
+    }
+  });
+
+  aiMinusButton.addEventListener("click", () => {
+    if (parseInt(aiNumber.textContent) > 1) {
+      aiNumber.innerText = `${parseInt(aiNumber.textContent) - 1}`;
+    }
+  });
+
+  aiAddButton.addEventListener("click", () => {
+    if (parseInt(aiNumber.textContent) < 10) {
+      aiNumber.innerText = `${parseInt(aiNumber.textContent) + 1}`;
     }
   });
 </script>
