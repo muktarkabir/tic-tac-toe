@@ -209,6 +209,17 @@ main {
         border: 2px solid black;
         box-shadow: var(--mid-box-shadow);
         border-radius: var(--border-radius);
+        display: flex;
+        justify-content: space-around;
+
+        & p{
+            background-color: #fff;
+            width: 1.6rem;
+            text-align: center;
+        }
+        & img{
+          cursor: pointer;  
+        }
       }
     }
 
