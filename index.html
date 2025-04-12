@@ -113,4 +113,10 @@
       humanNumber.innerText = `${parseInt(humanNumber.textContent) - 1}`;
     }
   });
+
+  humanAddButton.addEventListener("click", () => {
+    if (parseInt(humanNumber.textContent) < 10) {
+      humanNumber.innerText = `${parseInt(humanNumber.textContent) + 1}`;
+    }
+  });
 </script>
