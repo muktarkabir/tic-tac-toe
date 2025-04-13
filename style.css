@@ -13,6 +13,9 @@
   --border-radius: 8px;
   --white: #fff;
   --off-screen-translation: 0%;
+  --big-button-height: 70px;
+  --half-pixel-border: 0.5px solid black;
+  --dialog-left-margin: 7px;
 }
 
 body {
@@ -35,10 +38,24 @@ main {
 .window {
   width: 100%;
   display: flex;
+  padding: 0 6px 0 0;
+  /* border: 2px solid blue; */
 }
 
 .game {
   width: 100%;
+
+  & section.live-info {
+    display: none;
+    width: 100%;
+    margin-top: 12px;
+    padding: 6px;
+    height: var(--big-button-height);
+    background-color: var(--white);
+    border: var(--border);
+    box-shadow: var(--max-box-shadow);
+    border-radius: var(--border-radius);
+  }
 }
 
 .score-board {
@@ -66,7 +83,7 @@ main {
 }
 
 .game-board {
-  margin-top: 20px;
+  margin-top: 12px;
   width: 300px;
   align-self: center;
   display: grid;
@@ -79,7 +96,6 @@ main {
   box-shadow: var(--max-box-shadow);
 
   & .cell {
-    --half-pixel-border:0.5px solid black;
     border-bottom: var(--half-pixel-border);
     border-right: var(--half-pixel-border);
     height: 100px;
@@ -99,6 +115,7 @@ main {
   align-items: center;
   margin-top: 20px;
   width: 100%;
+  margin-bottom: 6px;
 
   & .reset-quit {
     width: 300px;
@@ -125,7 +142,7 @@ main {
   & .start {
     width: 100%;
     margin: 12px 0px;
-    height: 70px;
+    height: var(--big-button-height);
     background-color: var(--malachite-green);
     border: var(--border);
     box-shadow: var(--min-box-shadow);
@@ -169,7 +186,6 @@ main {
       display: flex;
       align-items: center;
       width: 100%;
-      margin-left: 14px;
     }
 
     & div form {
@@ -236,10 +252,11 @@ main {
     }
 
     & .vs-human {
+      margin-left: var(--dialog-left-margin);
     }
 
     & .vs-ai {
-      margin-left: 0;
+      margin-left: var(--dialog-left-margin);
       form {
         input[type="text"] {
           margin-bottom: auto;
