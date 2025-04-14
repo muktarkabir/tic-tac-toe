@@ -431,37 +431,83 @@ function gameController(player1, player2) {
 const domManipulations = (function () {
   const gameContainer = document.querySelector(".game");
   const scoreBoard = gameContainer.querySelector(".score-board");
+  const xPlayerScore = scoreBoard.querySelector(".x-player-score h1");
+  const drawCount = scoreBoard.querySelector(".draw-count h1");
+  const oPlayerScore = scoreBoard.querySelector(".o-player-score h1");
+
   const liveInfoSection = gameContainer.querySelector(".live-info");
+  const currentPlayerMark = liveInfoSection.querySelector("span");
+
   const boardUi = gameContainer.querySelector(".game-board");
+  const controls = gameContainer.querySelector(".controls");
+  const quitButton = controls.querySelector(".quit");
+  const resetBbutton = controls.querySelector(".reset");
+  const startButton = controls.querySelector(".start");
+
+  const dialogs = document.querySelector(".versus-dialog");
+  const humanGameForm = dialogs.querySelector(".vs-human form");
+  const xPlayerName = humanGameForm.querySelector("#x-player-name");
+  const oPlayerName = humanGameForm.querySelector("#o-player-name");
+  const humanNumberOfGames = humanGameForm.querySelector("p");
+  const humanStartGameButton = humanGameForm.querySelector("button.start-game");
+
+  const aiGameForm = dialogs.querySelector(".vs-ai form");
+  const playerName = aiGameForm.querySelector("#player-name");
+  const aiNumberOfGames = aiGameForm.querySelector("p");
+  const aiStartGameButton = aiGameForm.querySelector("button.start-game");
 
   const addCells = () => {
     for (let i = 0; i < gameBoard.getBoard().length; i++) {
       let newCell = document.createElement("div");
       newCell.dataset.index = i;
       newCell.classList.add("cell");
-      gameBoard.getBoard()[i] == null ? newCell.append("") : newCell.append(`${gameBoard.getBoard()[i]}`);
+      gameBoard.getBoard()[i] == null
+        ? newCell.append("")
+        : newCell.append(`${gameBoard.getBoard()[i]}`);
       boardUi.appendChild(newCell);
-      console.log(newCell);
     }
   };
 
+  function moveGameOffScreen() {
+    const window = document.querySelector(".window");
+    window.style.transform = `translateX(${-100}%)`;
+  }
+
+  function moveGameBackToInitialPosition() {
+    const window = document.querySelector(".window");
+    window.style.transform = `translateX(${0}%)`;
+  }
+  const hidestartButtonAndShowLiveInfoSection = () => {
+    startButton.style.display = "none";
+    liveInfoSection.style.display = "block";
+  };
+
   addCells();
+
+  startButton.addEventListener("click", moveGameOffScreen);
+
+  humanStartGameButton.addEventListener("click", (e) => {
+    if (xPlayerName.value && oPlayerName.value) {
+      e.preventDefault();
+      moveGameBackToInitialPosition();
+      hidestartButtonAndShowLiveInfoSection();
+    }
+  });
+
+  aiStartGameButton.addEventListener("click", (e) => {
+    if (playerName.value) {
+      e.preventDefault();
+      moveGameBackToInitialPosition();
+      hidestartButtonAndShowLiveInfoSection();
+
+    }
+  });
 })();
 
 const usman = createHumanPlayer("Usman");
 const john = createHumanPlayer("John", "X");
 const computer = createRobot();
 const controller = gameController(usman, john);
-
-document.querySelector(".start").addEventListener("click", () => {
-  moveGameOffScreen();
-});
-
-function moveGameOffScreen() {
-  const game = document.querySelector(".window");
-  const versusDialogs = document.querySelector(".versus-dialog");
-  game.style.transform = `translateX(${-100}%)`;
-  game.style.transition = `transform .3s ease-in`;
-  // versusDialogs.style.transform = `translateX(${-120}%)`;
-  // versusDialogs.style.transition = `transform .3s ease-in`;
+function getController() {
+  return controller;
 }
