@@ -106,6 +106,7 @@ function createHumanPlayer(name, mark = "O") {
   const playAtPosition = (position) => {
     if (isMyturn) {
       gameBoard.placeMark(position, mark);
+      domManipulations.playAtPosition(playAtPosition, mark);
     } else {
       console.log("Its not your turn to play");
       return;
@@ -119,6 +120,7 @@ function createHumanPlayer(name, mark = "O") {
   const increaseScore = () => score++;
   const getScore = () => score;
   const resetScore = () => (score = 0);
+  const isAi = () => false;
 
   return {
     playAtPosition,
@@ -129,6 +131,7 @@ function createHumanPlayer(name, mark = "O") {
     increaseScore,
     getScore,
     resetScore,
+    isAi,
   };
 }
 function createRobot() {
@@ -170,6 +173,7 @@ function createRobot() {
         console.log("END OF SIMULATION");
 
         gameBoard.placeMark(bestAction, mark);
+        domManipulations.playAtPosition(bestAction, "X");
       }
     } else {
       console.log("Not your turn android!");
@@ -194,6 +198,7 @@ function createRobot() {
   const increaseScore = () => score++;
   const getScore = () => score;
   const resetScore = () => (score = 0);
+  const isAi = () => true;
 
   return {
     playAtRandomPosition,
@@ -206,6 +211,7 @@ function createRobot() {
     increaseScore,
     getScore,
     resetScore,
+    isAi,
   };
 }
 
@@ -367,8 +373,7 @@ const aiMethods = (function () {
   };
 })();
 
-function gameController(player1, player2) {
-  let numberOfGames = 3;
+function gameController(player1, player2, numberOfGames) {
   let numberOfDraws = 0;
   player2.toggleTurn();
   const board = gameBoard.getBoard();
@@ -429,6 +434,8 @@ function gameController(player1, player2) {
 }
 
 const domManipulations = (function () {
+  let gameOn = false;
+  let xPlayer, oPlayer, numberOfGamesToPlay;
   const gameContainer = document.querySelector(".game");
   const scoreBoard = gameContainer.querySelector(".score-board");
   const xPlayerScore = scoreBoard.querySelector(".x-player-score h1");
@@ -437,8 +444,11 @@ const domManipulations = (function () {
 
   const liveInfoSection = gameContainer.querySelector(".live-info");
   const currentPlayerMark = liveInfoSection.querySelector("span");
+  const roundWinner = liveInfoSection.querySelector(".round-winner");
+  const aiThoughts = liveInfoSection.querySelector(".ai-thoughts");
 
   const boardUi = gameContainer.querySelector(".game-board");
+
   const controls = gameContainer.querySelector(".controls");
   const quitButton = controls.querySelector(".quit");
   const resetBbutton = controls.querySelector(".reset");
@@ -456,17 +466,14 @@ const domManipulations = (function () {
   const aiNumberOfGames = aiGameForm.querySelector("p");
   const aiStartGameButton = aiGameForm.querySelector("button.start-game");
 
-  const addCells = () => {
+  const addCells = (() => {
     for (let i = 0; i < gameBoard.getBoard().length; i++) {
       let newCell = document.createElement("div");
       newCell.dataset.index = i;
       newCell.classList.add("cell");
-      gameBoard.getBoard()[i] == null
-        ? newCell.append("")
-        : newCell.append(`${gameBoard.getBoard()[i]}`);
       boardUi.appendChild(newCell);
     }
-  };
+  })();
 
   function moveGameOffScreen() {
     const window = document.querySelector(".window");
@@ -482,7 +489,18 @@ const domManipulations = (function () {
     liveInfoSection.style.display = "block";
   };
 
-  addCells();
+  const placeMark = (position, mark) =>
+    (boardUi.childNodes[position].innerText = mark);
+  const updateXplayerScore = (newScore) => (xPlayerScore.innerText = newScore);
+  const updateOplayerScore = (newScore) => (oPlayerScore.innerText = newScore);
+  const updateDrawCount = (newScore) => (drawCount.innerText = newScore);
+  const showRoundWinner = (message) => {
+    roundWinner.textContent = "";
+    setTimeout(() => {
+      roundWinner.textContent = message;
+    }, 300);
+    roundWinner.textContent = "";
+  };
 
   startButton.addEventListener("click", moveGameOffScreen);
 
@@ -491,6 +509,11 @@ const domManipulations = (function () {
       e.preventDefault();
       moveGameBackToInitialPosition();
       hidestartButtonAndShowLiveInfoSection();
+      xPlayer = createHumanPlayer(xPlayerName.value, "X");
+      oPlayer = createHumanPlayer(oPlayerName, value);
+      numberOfGamesToPlay = parseInt(humanNumberOfGames.innerText);
+      controller = gameController(xPlayer, oPlayer, numberOfGamesToPlay);
+      gameOn = true;
     }
   });
 
@@ -499,15 +522,45 @@ const domManipulations = (function () {
       e.preventDefault();
       moveGameBackToInitialPosition();
       hidestartButtonAndShowLiveInfoSection();
-
+      xPlayer = createRobot();
+      oPlayer = createHumanPlayer(oPlayerName, value);
+      numberOfGamesToPlay = parseInt(aiNumberOfGames.innerText);
+      controller = gameController(xPlayer, oPlayer, numberOfGamesToPlay);
+      gameOn = true;
+      xPlayer.playAtBestPosition(gameBoard.getBoard());
     }
   });
+
+  boardUi.addEventListener("click", (e) => {
+    if (gameOn) {
+      if (e.target.matches(".cell") && e.target.innerText == "") {
+        console.log(e.target);
+        if (xPlayer.getTurn()) {
+          xPlayer.playAtPosition(
+            parseInt(e.target.dataset.index),
+            aiMethods.playerTomakeMove(gameBoard.getBoard())
+          );
+        } else if (oPlayer.getTurn()) {
+          oPlayer.playAtPosition(
+            parseInt(e.target.dataset.index),
+            aiMethods.playerTomakeMove(gameBoard.getBoard())
+          );
+          if (xPlayer.isAi) {
+            xPlayer.playAtBestPosition(gameBoard.getBoard());
+          }
+        }
+      }
+    }
+  });
+  return {
+    placeMark,
+    updateDrawCount,
+    updateXplayerScore,
+    updateOplayerScore,
+  };
 })();
 
-const usman = createHumanPlayer("Usman");
-const john = createHumanPlayer("John", "X");
-const computer = createRobot();
-const controller = gameController(usman, john);
-function getController() {
-  return controller;
-}
+// const usman = createHumanPlayer("Usman");
+// const john = createHumanPlayer("John", "X");
+// const computer = createRobot();
+let controller;
