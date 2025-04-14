@@ -428,6 +428,26 @@ function gameController(player1, player2) {
   return { checkWinner, setPlayerTurn };
 }
 
+const domManipulations = (function () {
+  const gameContainer = document.querySelector(".game");
+  const scoreBoard = gameContainer.querySelector(".score-board");
+  const liveInfoSection = gameContainer.querySelector(".live-info");
+  const boardUi = gameContainer.querySelector(".game-board");
+
+  const addCells = () => {
+    for (let i = 0; i < gameBoard.getBoard().length; i++) {
+      let newCell = document.createElement("div");
+      newCell.dataset.index = i;
+      newCell.classList.add("cell");
+      gameBoard.getBoard()[i] == null ? newCell.append("") : newCell.append(`${gameBoard.getBoard()[i]}`);
+      boardUi.appendChild(newCell);
+      console.log(newCell);
+    }
+  };
+
+  addCells();
+})();
+
 const usman = createHumanPlayer("Usman");
 const john = createHumanPlayer("John", "X");
 const computer = createRobot();
@@ -445,4 +465,3 @@ function moveGameOffScreen() {
   // versusDialogs.style.transform = `translateX(${-120}%)`;
   // versusDialogs.style.transition = `transform .3s ease-in`;
 }
-
