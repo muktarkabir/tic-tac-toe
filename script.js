@@ -23,9 +23,6 @@ const gameBoard = (function () {
     } else {
       board[position] = playerMark;
       controller.setPlayerTurn();
-      console.log(
-        `${board[0]}, ${board[1]}, ${board[2]},\n${board[3]}, ${board[4]}, ${board[5]},\n ${board[6]}, ${board[7]}, ${board[8]}`
-      );
       console.log(board);
     }
     if (atLeastFiveCellsAreFilled()) {
@@ -33,13 +30,15 @@ const gameBoard = (function () {
     }
   };
 
-  const resetBoard = () => board.fill(null);
+  const resetBoard = () => {
+    board.fill(null);
+  };
 
   const getPositionsNames = () => positionNames;
 
   const getBoard = () => board;
-  const isBoardFilledUp = () =>
-    board.filter((child) => child == null).length == 0;
+  const isFilledUp = () => board.filter((child) => child == null).length == 0;
+
   const atLeastFiveCellsAreFilled = () =>
     board.filter((child) => child != null).length >= 5;
 
@@ -92,7 +91,7 @@ const gameBoard = (function () {
     placeMark,
     getBoard,
     resetBoard,
-    isBoardFilledUp,
+    isFilledUp,
     arrayOfFreeCells,
     getPositionsNames,
     gameBoardIsEmpty,
@@ -106,7 +105,7 @@ function createHumanPlayer(name, mark = "O") {
   const playAtPosition = (position) => {
     if (isMyturn) {
       gameBoard.placeMark(position, mark);
-      domManipulations.playAtPosition(playAtPosition, mark);
+      domManipulations.placeMark(position, mark);
     } else {
       console.log("Its not your turn to play");
       return;
@@ -160,6 +159,7 @@ function createRobot() {
       if (gameBoard.gameBoardIsEmpty()) {
         //manually playing the first move for performance issues
         gameBoard.placeMark(0, mark);
+        domManipulations.placeMark(0, mark);
       } else {
         let bestAction =
           aiMethods.actions(state)[
@@ -173,7 +173,7 @@ function createRobot() {
         console.log("END OF SIMULATION");
 
         gameBoard.placeMark(bestAction, mark);
-        domManipulations.playAtPosition(bestAction, "X");
+        domManipulations.placeMark(bestAction, "X");
       }
     } else {
       console.log("Not your turn android!");
@@ -373,29 +373,27 @@ const aiMethods = (function () {
   };
 })();
 
-function gameController(player1, player2, numberOfGames) {
+function gameController(player1, player2, numberOfGamesToPlay) {
   let numberOfDraws = 0;
+  let numberOfGames = numberOfGamesToPlay;
   player2.toggleTurn();
   const board = gameBoard.getBoard();
   const checkWinner = (playersMark) => {
     if (gameBoard.satisfiesWinningConditions(board, playersMark)) {
-      const winningPlayersName =
-        player1.getMark() == playersMark
-          ? player1.getName()
-          : player2.getName();
-      player1.getMark() == playersMark
-        ? player1.increaseScore()
-        : player2.increaseScore();
-      console.log(`${playersMark}:${winningPlayersName} wins this round!!!.`);
+      increaseScoreForWinner(playersMark);
       numberOfGames--;
       if (numberOfGames == 0) annouceWinner();
-      gameBoard.resetBoard();
-    } else if (gameBoard.isBoardFilledUp()) {
+      domManipulations.toggleGame();
+      domManipulations.showNextRoundButton();
+    } else if (gameBoard.isFilledUp()) {
       console.log("Game ended in a tie");
+      domManipulations.showRoundWinner(`This round ended in a draw.`);
       numberOfDraws++;
       numberOfGames--;
+      domManipulations.updateDrawCount(numberOfDraws);
+      domManipulations.showNextRoundButton();
+      domManipulations.toggleGame();
       if (numberOfGames == 0) annouceWinner();
-      gameBoard.resetBoard();
     }
   };
 
@@ -423,18 +421,43 @@ function gameController(player1, player2, numberOfGames) {
     player2.resetScore();
     gameBoard.resetBoard();
     numberOfDraws = 0;
-    numberOfGames = 3;
+    numberOfGames = numberOfGamesToPlay;
   };
   const setPlayerTurn = () => {
     player1.toggleTurn();
     player2.toggleTurn();
   };
+  const getNumberOfDraws = () => numberOfDraws;
 
-  return { checkWinner, setPlayerTurn };
+  const increaseScoreForWinner = (playersMark) => {
+    let winningPlayersName;
+    if (player1.getMark() == playersMark) {
+      winningPlayersName = player1.getName();
+      player1.increaseScore();
+      domManipulations.updateXplayerScore(player1.getScore());
+    } else {
+      winningPlayersName = player2.getName();
+      player2.increaseScore();
+      domManipulations.updateOplayerScore(player2.getScore());
+    }
+    console.log(
+      `${playersMark} player: ${winningPlayersName} wins this round!!!.`
+    );
+    domManipulations.showRoundWinner(
+      `${playersMark} player: ${winningPlayersName} wins this round!!!.`
+    );
+  };
+
+  return { checkWinner, setPlayerTurn, getNumberOfDraws };
 }
 
 const domManipulations = (function () {
   let gameOn = false;
+  let resetButtonOn = false;
+  const toggleGame = () => {
+    gameOn = !gameOn;
+    resetButtonOn = !resetButtonOn;
+  };
   let xPlayer, oPlayer, numberOfGamesToPlay;
   const gameContainer = document.querySelector(".game");
   const scoreBoard = gameContainer.querySelector(".score-board");
@@ -451,7 +474,8 @@ const domManipulations = (function () {
 
   const controls = gameContainer.querySelector(".controls");
   const quitButton = controls.querySelector(".quit");
-  const resetBbutton = controls.querySelector(".reset");
+  const resetButton = controls.querySelector(".reset");
+
   const startButton = controls.querySelector(".start");
 
   const dialogs = document.querySelector(".versus-dialog");
@@ -471,6 +495,7 @@ const domManipulations = (function () {
       let newCell = document.createElement("div");
       newCell.dataset.index = i;
       newCell.classList.add("cell");
+      newCell.innerText = "";
       boardUi.appendChild(newCell);
     }
   })();
@@ -484,9 +509,14 @@ const domManipulations = (function () {
     const window = document.querySelector(".window");
     window.style.transform = `translateX(${0}%)`;
   }
-  const hidestartButtonAndShowLiveInfoSection = () => {
+  const hideStartButtonAndShowLiveInfoSection = () => {
     startButton.style.display = "none";
     liveInfoSection.style.display = "block";
+  };
+
+  const showNextRoundButton = () => {
+    resetButton.textContent = "";
+    resetButton.textContent = "Next round";
   };
 
   const placeMark = (position, mark) =>
@@ -496,21 +526,43 @@ const domManipulations = (function () {
   const updateDrawCount = (newScore) => (drawCount.innerText = newScore);
   const showRoundWinner = (message) => {
     roundWinner.textContent = "";
+    roundWinner.textContent = message;
     setTimeout(() => {
-      roundWinner.textContent = message;
-    }, 300);
-    roundWinner.textContent = "";
+      roundWinner.textContent = "";
+    }, 3000);
+  };
+  const updateCurrentPlayerMark = () => {
+    currentPlayerMark.innerText = xPlayer.getTurn()
+      ? xPlayer.getMark()
+      : oPlayer.getMark();
+  };
+  const resetBoard = () => {
+    boardUi.childNodes.forEach((element) => {
+      element.innerText = "";
+    });
   };
 
   startButton.addEventListener("click", moveGameOffScreen);
+  resetButton.addEventListener("click", () => {
+    if (!gameOn && resetButtonOn) {
+      console.log("active");
+      resetBoard();
+      gameBoard.resetBoard();
+      toggleGame();
+      if (xPlayer.isAi()) {
+        xPlayer.playAtBestPosition();
+        controller.setPlayerTurn();
+      }
+    }
+  });
 
   humanStartGameButton.addEventListener("click", (e) => {
     if (xPlayerName.value && oPlayerName.value) {
       e.preventDefault();
       moveGameBackToInitialPosition();
-      hidestartButtonAndShowLiveInfoSection();
+      hideStartButtonAndShowLiveInfoSection();
       xPlayer = createHumanPlayer(xPlayerName.value, "X");
-      oPlayer = createHumanPlayer(oPlayerName, value);
+      oPlayer = createHumanPlayer(oPlayerName.value, "O");
       numberOfGamesToPlay = parseInt(humanNumberOfGames.innerText);
       controller = gameController(xPlayer, oPlayer, numberOfGamesToPlay);
       gameOn = true;
@@ -521,9 +573,9 @@ const domManipulations = (function () {
     if (playerName.value) {
       e.preventDefault();
       moveGameBackToInitialPosition();
-      hidestartButtonAndShowLiveInfoSection();
+      hideStartButtonAndShowLiveInfoSection();
       xPlayer = createRobot();
-      oPlayer = createHumanPlayer(oPlayerName, value);
+      oPlayer = createHumanPlayer(oPlayerName.value, "O");
       numberOfGamesToPlay = parseInt(aiNumberOfGames.innerText);
       controller = gameController(xPlayer, oPlayer, numberOfGamesToPlay);
       gameOn = true;
@@ -534,21 +586,23 @@ const domManipulations = (function () {
   boardUi.addEventListener("click", (e) => {
     if (gameOn) {
       if (e.target.matches(".cell") && e.target.innerText == "") {
-        console.log(e.target);
         if (xPlayer.getTurn()) {
           xPlayer.playAtPosition(
             parseInt(e.target.dataset.index),
-            aiMethods.playerTomakeMove(gameBoard.getBoard())
+            xPlayer.getMark()
           );
         } else if (oPlayer.getTurn()) {
           oPlayer.playAtPosition(
             parseInt(e.target.dataset.index),
-            aiMethods.playerTomakeMove(gameBoard.getBoard())
+            oPlayer.getMark()
           );
-          if (xPlayer.isAi) {
-            xPlayer.playAtBestPosition(gameBoard.getBoard());
+          if (xPlayer.isAi()) {
+            setTimeout(() => {
+              xPlayer.playAtBestPosition(gameBoard.getBoard());
+            }, 30);
           }
         }
+        updateCurrentPlayerMark();
       }
     }
   });
@@ -557,10 +611,11 @@ const domManipulations = (function () {
     updateDrawCount,
     updateXplayerScore,
     updateOplayerScore,
+    showRoundWinner,
+    resetBoard,
+    showNextRoundButton,
+    toggleGame,
   };
 })();
 
-// const usman = createHumanPlayer("Usman");
-// const john = createHumanPlayer("John", "X");
-// const computer = createRobot();
 let controller;
