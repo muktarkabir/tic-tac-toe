@@ -45,6 +45,7 @@ main {
 
 .game {
   width: 100%;
+  position: relative;
 
   & section.live-info {
     display: none;
@@ -270,4 +271,63 @@ main {
 }
 .inactive {
   background-color: gray !important;
+}
+
+dialog {
+  height: 100%;
+  width: 110%;
+  z-index: 2;
+  background-color: transparent;
+  position: absolute;
+  backdrop-filter: blur(4px);
+  border: none;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.final-scores {
+  width: 90%;
+  height: 46%;
+  background-color: var(--cyan-blue);
+  border-radius: var(--border-radius);
+  border: var(--border);
+  box-shadow: var(--mid-box-shadow);
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+
+  h1{
+    margin-bottom: .4rem;
+  }
+
+  p {
+    font-weight: 300;
+    font-size: 1.4rem;
+  }
+
+  div {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    border: var(--small-border);
+    box-shadow: var(--mid-box-shadow);
+    padding: 0.4rem;
+    margin-bottom: auto;
+
+    p{
+      font-size: initial;
+    }
+  }
+
+  button{
+    height: 40px;
+    width: 100%;
+    border: var(--small-border);
+    box-shadow: var(--mid-box-shadow);
+    background-color: var(--white);
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+  
+  }
 }
