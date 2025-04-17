@@ -155,7 +155,6 @@ function createRobot() {
   const playAtBestPosition = (state) => {
     if (isMyturn) {
       //check current state and see all actions that can be taken, i.e free cells and store them
-      console.log("Calculating best play...");
       if (gameBoard.gameBoardIsEmpty()) {
         //manually playing the first move for performance issues
         gameBoard.placeMark(0, mark);
@@ -165,13 +164,17 @@ function createRobot() {
           aiMethods.actions(state)[
             getIndexOfBestValue(aiMethods.maxValue(state, true))
           ];
-        console.log(
-          `The best position to play is ${bestAction}: ${
-            gameBoard.getPositionsNames()[bestAction]
-          } for player ${mark}`
-        );
-        console.log("END OF SIMULATION");
+        // console.log(
+        //   `The best position to play is ${bestAction}: ${
+        //     gameBoard.getPositionsNames()[bestAction]
+        //   } for player ${mark}`
+        // );
 
+        domManipulations.setAiThoughts(
+          `${gameBoard.getPositionsNames()[bestAction]}`
+        );
+        domManipulations.setAiThoughts("");
+        console.log("END OF SIMULATION");
         gameBoard.placeMark(bestAction, mark);
         domManipulations.placeMark(bestAction, "X");
       }
@@ -384,15 +387,15 @@ function gameController(player1, player2, numberOfGamesToPlay) {
       numberOfGames--;
       if (numberOfGames == 0) annouceWinner();
       domManipulations.toggleGame();
-      domManipulations.showNextRoundButton();
+      domManipulations.toggleButtonStates();
     } else if (gameBoard.isFilledUp()) {
       console.log("Game ended in a tie");
       domManipulations.showRoundWinner(`This round ended in a draw.`);
       numberOfDraws++;
       numberOfGames--;
       domManipulations.updateDrawCount(numberOfDraws);
-      domManipulations.showNextRoundButton();
       domManipulations.toggleGame();
+      domManipulations.toggleButtonStates();
       if (numberOfGames == 0) annouceWinner();
     }
   };
@@ -440,9 +443,6 @@ function gameController(player1, player2, numberOfGamesToPlay) {
       player2.increaseScore();
       domManipulations.updateOplayerScore(player2.getScore());
     }
-    console.log(
-      `${playersMark} player: ${winningPlayersName} wins this round!!!.`
-    );
     domManipulations.showRoundWinner(
       `${playersMark} player: ${winningPlayersName} wins this round!!!.`
     );
@@ -453,11 +453,7 @@ function gameController(player1, player2, numberOfGamesToPlay) {
 
 const domManipulations = (function () {
   let gameOn = false;
-  let resetButtonOn = false;
-  const toggleGame = () => {
-    gameOn = !gameOn;
-    resetButtonOn = !resetButtonOn;
-  };
+  let nextRoundButtonOn = false;
   let xPlayer, oPlayer, numberOfGamesToPlay;
   const gameContainer = document.querySelector(".game");
   const scoreBoard = gameContainer.querySelector(".score-board");
@@ -473,8 +469,8 @@ const domManipulations = (function () {
   const boardUi = gameContainer.querySelector(".game-board");
 
   const controls = gameContainer.querySelector(".controls");
-  const quitButton = controls.querySelector(".quit");
-  const resetButton = controls.querySelector(".reset");
+  const clearButton = controls.querySelector(".clear");
+  const nextRoundButton = controls.querySelector(".next-round");
 
   const startButton = controls.querySelector(".start");
 
@@ -500,6 +496,14 @@ const domManipulations = (function () {
     }
   })();
 
+  const setAiThoughts = (thoughts) => {
+    aiThoughts.textContent = "";
+    setTimeout(() => {
+      aiThoughts.textContent = thoughts;
+    }, 300);
+    aiThoughts.textContent = "";
+  };
+
   function moveGameOffScreen() {
     const window = document.querySelector(".window");
     window.style.transform = `translateX(${-100}%)`;
@@ -514,9 +518,9 @@ const domManipulations = (function () {
     liveInfoSection.style.display = "block";
   };
 
-  const showNextRoundButton = () => {
-    resetButton.textContent = "";
-    resetButton.textContent = "Next round";
+  const toggleButtonStates = () => {
+    nextRoundButton.classList.toggle("inactive");
+    clearButton.classList.toggle("inactive");
   };
 
   const placeMark = (position, mark) =>
@@ -542,16 +546,36 @@ const domManipulations = (function () {
     });
   };
 
+  const toggleGame = () => {
+    gameOn = !gameOn;
+    nextRoundButtonOn = !nextRoundButtonOn;
+  };
+
   startButton.addEventListener("click", moveGameOffScreen);
-  resetButton.addEventListener("click", () => {
-    if (!gameOn && resetButtonOn) {
-      console.log("active");
+
+  clearButton.addEventListener("click", () => {
+    if (gameOn && !clearButton.classList.contains("inactive")) {
+      resetBoard();
+      gameBoard.resetBoard();
+      controller.setPlayerTurn();
+      updateCurrentPlayerMark();
+      if (xPlayer.isAi()) {
+        xPlayer.playAtBestPosition(gameBoard.getBoard());
+        updateCurrentPlayerMark();
+      }
+    }
+  });
+
+  nextRoundButton.addEventListener("click", () => {
+    if (!gameOn && nextRoundButtonOn) {
       resetBoard();
       gameBoard.resetBoard();
       toggleGame();
+      toggleButtonStates();
       if (xPlayer.isAi()) {
-        xPlayer.playAtBestPosition();
         controller.setPlayerTurn();
+        xPlayer.playAtBestPosition(gameBoard.getBoard());
+        updateCurrentPlayerMark();
       }
     }
   });
@@ -597,9 +621,12 @@ const domManipulations = (function () {
             oPlayer.getMark()
           );
           if (xPlayer.isAi()) {
+            gameOn = false;
             setTimeout(() => {
               xPlayer.playAtBestPosition(gameBoard.getBoard());
             }, 30);
+            updateCurrentPlayerMark();
+            gameOn = true;
           }
         }
         updateCurrentPlayerMark();
@@ -613,8 +640,9 @@ const domManipulations = (function () {
     updateOplayerScore,
     showRoundWinner,
     resetBoard,
-    showNextRoundButton,
+    toggleButtonStates,
     toggleGame,
+    setAiThoughts,
   };
 })();
 

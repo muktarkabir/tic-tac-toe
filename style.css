@@ -39,7 +39,7 @@ main {
   width: 100%;
   display: flex;
   padding: 0 6px 0 0;
-  transition: transform .3s ease-in;
+  transition: transform 0.3s ease-in;
   /* border: 2px solid blue; */
 }
 
@@ -120,15 +120,15 @@ main {
   width: 100%;
   margin-bottom: 6px;
 
-  & .reset-quit {
+  & .clear-nextround {
     width: 300px;
     display: flex;
     justify-content: space-between;
-    & .quit {
+    & .clear {
       background-color: var(--coral);
       color: var(--white);
     }
-    & .reset {
+    & .next-round {
       background-color: var(--neon-yellow);
     }
     & button {
@@ -267,4 +267,7 @@ main {
       }
     }
   }
+}
+.inactive {
+  background-color: gray !important;
 }

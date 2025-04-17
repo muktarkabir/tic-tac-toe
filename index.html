@@ -12,7 +12,9 @@
     <main>
       <div class="window">
         <div class="game">
-          <div class="score-board"><h2 class="title">Score Board</h2><div class="stats">
+          <div class="score-board">
+            <h2 class="title">Score Board</h2>
+            <div class="stats">
               <div class="x-player-score">
                 <h4>X Player</h4>
                 <h1>0</h1>
@@ -25,15 +27,20 @@
                 <h4>O Player</h4>
                 <h1>0</h1>
               </div>
-            </div></div>
+            </div>
+          </div>
           <section class="live-info">
-            <p><strong><span>X</span></strong> Player's turn</p><p class="ai-thoughts"></p><p class="round-winner"></p>
+            <p>
+              <strong><span>X</span></strong> Player's turn
+            </p>
+            <p class="ai-thoughts"></p>
+            <p class="round-winner"></p>
           </section>
           <div class="game-board"></div>
           <div class="controls">
-            <div class="reset-quit">
-              <button type="button" class="quit">Quit</button>
-              <button type="button" class="reset">Reset</button>
+            <div class="clear-nextround">
+              <button type="button" class="clear">Clear</button>
+              <button type="button" class="next-round inactive">Next Round</button>
             </div>
             <button type="button" class="start">Start</button>
           </div>
