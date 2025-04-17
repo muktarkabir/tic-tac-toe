@@ -401,23 +401,23 @@ function gameController(player1, player2, numberOfGamesToPlay) {
   };
 
   const annouceWinner = () => {
-    console.log("----------FINAL SCORES----------");
-    console.log(`${player1.getMark()} Player's Score: ${player1.getScore()}`);
-    console.log(`${player2.getMark()} Player's Score: ${player2.getScore()}`);
-    console.log(`${numberOfDraws} Draws.`);
+    let announcement;
+    let xPlayerScore = `${player1.getMark()} Player's Score: ${player1.getScore()}`;
+    let oPlayerScore = `${player2.getMark()} Player's Score: ${player2.getScore()}`;
+    let drawScore = `${numberOfDraws} Draws.`
     if (player1.getScore() > player2.getScore()) {
-      console.log(
-        `The winner is ${player1.getMark()} player: ${player1.getName()}`
-      );
+      
+      announcement = `The winner is ${player1.getMark()} player: ${player1.getName()}`;
     } else if (player2.getScore() > player1.getScore()) {
-      console.log(
+      announcement =
         `The winner is ${player2.getMark()} player: ${player2.getName()}`
-      );
+      ;
     } else {
-      console.log("Game Ended in a Draw!!");
+      announcement = "Game Ended in a Draw!!";
     }
 
-    resetGame();
+    domManipulations.announceWinner(announcement,xPlayerScore,oPlayerScore,drawScore);
+    
   };
   const resetGame = () => {
     player1.resetScore();
@@ -454,7 +454,7 @@ function gameController(player1, player2, numberOfGamesToPlay) {
 const domManipulations = (function () {
   let gameOn = false;
   let nextRoundButtonOn = false;
-  let xPlayer, oPlayer, numberOfGamesToPlay;
+  let xPlayer, oPlayer, numberOfGamesToPlay ;
   const gameContainer = document.querySelector(".game");
   const scoreBoard = gameContainer.querySelector(".score-board");
   const xPlayerScore = scoreBoard.querySelector(".x-player-score h1");
@@ -485,7 +485,18 @@ const domManipulations = (function () {
   const playerName = aiGameForm.querySelector("#player-name");
   const aiNumberOfGames = aiGameForm.querySelector("p");
   const aiStartGameButton = aiGameForm.querySelector("button.start-game");
+  const dialog = document.querySelector("dialog");
+  const closeButton = dialog.querySelector("button");
 
+  const announceWinner = (winner,xPlayerScore,oPlayerScore,drawScore)=>{
+    dialog.querySelector('.final-scores h1').textContent = winner;
+    const infoDiv = dialog.querySelector('.final-scores div').childNodes;
+    infoDiv[0].textContent = xPlayerScore;
+    infoDiv[1].textContent = oPlayerScore;
+    infoDiv[2].textContent = drawScore;
+    dialog.show();
+    
+  };
   const addCells = (() => {
     for (let i = 0; i < gameBoard.getBoard().length; i++) {
       let newCell = document.createElement("div");
@@ -513,9 +524,14 @@ const domManipulations = (function () {
     const window = document.querySelector(".window");
     window.style.transform = `translateX(${0}%)`;
   }
-  const hideStartButtonAndShowLiveInfoSection = () => {
-    startButton.style.display = "none";
-    liveInfoSection.style.display = "block";
+  const hideStartButtonAndShowLiveInfoSection = (show) => {
+    if (show) {
+      startButton.style.display = "block";
+      liveInfoSection.style.display = "none";
+    } else {
+      startButton.style.display = "none";
+      liveInfoSection.style.display = "block";
+    }
   };
 
   const toggleButtonStates = () => {
@@ -550,6 +566,8 @@ const domManipulations = (function () {
     gameOn = !gameOn;
     nextRoundButtonOn = !nextRoundButtonOn;
   };
+
+
 
   startButton.addEventListener("click", moveGameOffScreen);
 
@@ -633,6 +651,19 @@ const domManipulations = (function () {
       }
     }
   });
+
+  closeButton.addEventListener("click", () => {
+    hideStartButtonAndShowLiveInfoSection(true);
+    dialog.close();
+    gameBoard.resetBoard();
+    resetBoard();
+    controller = null;
+    gameOn = false;
+    nextRoundButtonOn = false;
+    xPlayerScore.textContent = "0";
+    oPlayerScore.textContent = "0";
+    drawCount.textContent = "0";
+  });
   return {
     placeMark,
     updateDrawCount,
@@ -643,7 +674,8 @@ const domManipulations = (function () {
     toggleButtonStates,
     toggleGame,
     setAiThoughts,
+    announceWinner
   };
 })();
 
-let controller;
+let controller = null;

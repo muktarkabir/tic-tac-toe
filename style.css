@@ -273,7 +273,7 @@ main {
   background-color: gray !important;
 }
 
-dialog {
+dialog:open {
   height: 100%;
   width: 110%;
   z-index: 2;
@@ -297,13 +297,16 @@ dialog {
   display: flex;
   flex-direction: column;
 
-  h1{
-    margin-bottom: .4rem;
+  h1 {
+    margin-bottom: 0.4rem;
+    line-height: 1;
+    font-size: 1.2rem;
+  text-wrap: stable;
   }
 
   p {
     font-weight: 300;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
   }
 
   div {
@@ -314,12 +317,12 @@ dialog {
     padding: 0.4rem;
     margin-bottom: auto;
 
-    p{
+    p {
       font-size: initial;
     }
   }
 
-  button{
+  button {
     height: 40px;
     width: 100%;
     border: var(--small-border);
@@ -328,6 +331,5 @@ dialog {
     font-weight: bold;
     border-radius: 6px;
     cursor: pointer;
-  
   }
 }
