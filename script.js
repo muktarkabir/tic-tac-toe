@@ -141,11 +141,7 @@ function createRobot() {
         //   } for player ${mark}`
         // );
 
-        domManipulations.setAiThoughts(
-          `${gameBoard.getPositionsNames()[bestAction]}`
-        );
-        domManipulations.setAiThoughts("");
-        console.log("END OF SIMULATION");
+        // console.log("END OF SIMULATION");
         gameBoard.placeMark(bestAction, mark);
         domManipulations.placeMark(bestAction, "X");
       }
@@ -216,15 +212,15 @@ const aiMethods = (function () {
       freeCellspositions.push(pos);
     }
 
-    console.log(
-      `Player ${playerMark} can make a move in ${freeCellspositions.length} possible positions.`
-    );
+    // console.log(
+    //   `Player ${playerMark} can make a move in ${freeCellspositions.length} possible positions.`
+    // );
 
-    for (const position of freeCellspositions) {
-      console.log(
-        `At position ${position}: ${gameBoard.getPositionsNames()[position]}`
-      );
-    }
+    // for (const position of freeCellspositions) {
+    //   console.log(
+    //     `At position ${position}: ${gameBoard.getPositionsNames()[position]}`
+    //   );
+    // }
     return freeCellspositions;
   };
   //RESULT(s,a) => returns the state after action a taken in state s
@@ -459,11 +455,10 @@ const domManipulations = (function () {
   })();
 
   const setAiThoughts = (thoughts) => {
-    aiThoughts.textContent = "";
+    aiThoughts.textContent = thoughts;
     setTimeout(() => {
-      aiThoughts.textContent = thoughts;
-    }, 300);
-    aiThoughts.textContent = "";
+      aiThoughts.textContent = "";
+    }, 1000);
   };
 
   function moveGameOffScreen() {
@@ -579,8 +574,9 @@ const domManipulations = (function () {
         } else if (oPlayer.getTurn()) {
           oPlayer.playAtPosition(parseInt(e.target.dataset.index),oPlayer.getMark());
           if (xPlayer.isAi()) {
+            setAiThoughts("Thinking...");
             gameOn = false;
-            setTimeout(() => {xPlayer.playAtBestPosition(gameBoard.getBoard());}, 30);
+            setTimeout(() => {xPlayer.playAtBestPosition(gameBoard.getBoard());}, 60);
             updateCurrentPlayerMark();
             gameOn = true;
           }
