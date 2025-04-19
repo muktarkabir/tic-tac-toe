@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>tic-tac-toe</title>
-    <link rel="shortcut icon" href="assets/tic-tac-toe-svgrepo-com.svg" type="image/x-icon">
+    <link
+      rel="shortcut icon"
+      href="assets/tic-tac-toe-svgrepo-com.svg"
+      type="image/x-icon"
+    />
     <script src="script.js" defer></script>
     <link rel="stylesheet" href="reset.css" />
     <link rel="stylesheet" href="style.css" />
@@ -14,7 +18,14 @@
       <div class="window">
         <div class="game">
           <dialog>
-            <div class="final-scores"><h1></h1><p>Final Scores</p><div><p></p><p></p><p></p></div>
+            <div class="final-scores">
+              <h1></h1>
+              <p>Final Scores</p>
+              <div>
+                <p></p>
+                <p></p>
+                <p></p>
+              </div>
               <button type="button">Okay</button>
             </div>
           </dialog>
@@ -46,13 +57,18 @@
           <div class="controls">
             <div class="clear-nextround">
               <button type="button" class="clear">Clear</button>
-              <button type="button" class="next-round inactive">Next Round</button>
+              <button type="button" class="next-round inactive">
+                Next Round
+              </button>
             </div>
             <button type="button" class="start">Start</button>
           </div>
         </div>
         <div class="versus-dialog">
-          <input type="checkbox" name="toggle" id="dialogs" />
+          <span class="switch">
+            <input type="checkbox" name="toggle" id="dialogs" />
+            <label for="dialogs"></label
+          ></span>
           <div class="vs-human-and-ai">
             <div class="vs-human">
               <form action="#">
@@ -138,5 +154,4 @@
       aiNumber.innerText = `${parseInt(aiNumber.textContent) + 1}`;
     }
   });
-
 </script>

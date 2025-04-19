@@ -156,26 +156,73 @@ main {
     cursor: pointer;
   }
 }
+.versus-dialog:has(#dialogs:checked) .vs-human-and-ai {
+  --off-screen-translation: calc(-110%);
+}
 
 .versus-dialog {
   min-height: 100%;
   min-width: 100%;
-  position: relative;
   overflow-x: hidden;
   margin: 0.6rem;
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  /* MODAL TOGGLING */
-  & input[type="checkbox"] {
-    position: absolute;
-    left: 46%;
-    top: 12px;
-    z-index: 3;
-  }
-  input[type="checkbox"]:checked ~ div {
-    --off-screen-translation: calc(-110%);
+  .switch {
+    width: 260px;
+    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 46px;
+    position: relative;
+
+    & input {
+      appearance: none;
+      width: 100%;
+      height: 100%;
+      border: var(--border);
+      box-shadow: var(--mid-box-shadow);
+      border-radius: var(--border-radius);
+      background-color: var(--cyan-blue);
+    }
+
+    & input::before,
+    input::after {
+      position: absolute;
+      z-index: 2;
+      top: 56%;
+      transform: translateY(-50%);
+      font-weight: bolder;
+    }
+
+    & input::before {
+      content: "1 VS. 1";
+      left: 20px;
+    }
+    & input::after {
+      content: "Robot";
+      right: 20px;
+    }
+
+    & label {
+      z-index: 1;
+      position: absolute;
+      top: 10px;
+      bottom: 8px;
+      border-radius: var(--border-radius);
+      background-color: #fff;
+      left: 10px;
+      right: 100px;
+      transition: all 0.4s;
+      width: 80px;
+    }
+
+    & input:checked + label {
+      left: 170px;
+      right: 10px;
+    }
   }
 
   & .vs-human-and-ai {
@@ -301,7 +348,7 @@ dialog:open {
     margin-bottom: 0.4rem;
     line-height: 1;
     font-size: 1.2rem;
-  text-wrap: stable;
+    text-wrap: stable;
   }
 
   p {
