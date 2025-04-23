@@ -13,18 +13,10 @@ const gameBoard = (function () {
   ];
 
   const placeMark = function (position, playerMark) {
-    if (position > board.length - 1 || position < 0) {
-      console.log("Out of Bounds!!!");
-      return;
-    }
-    if (board[position] != null) {
-      console.log("ILLEGAL MOVE!!");
-      return;
-    } else {
-      board[position] = playerMark;
-      controller.setPlayerTurn();
-      console.log(board);
-    }
+    board[position] = playerMark;
+    domManipulations.placeMark(position, playerMark);
+    controller.setPlayerTurn();
+
     if (atLeastFiveCellsAreFilled()) {
       controller.checkWinner(playerMark);
     }
@@ -105,7 +97,6 @@ function createHumanPlayer(name, mark = "O") {
   const playAtPosition = (position) => {
     if (isMyturn) {
       gameBoard.placeMark(position, mark);
-      domManipulations.placeMark(position, mark);
     } else {
       console.log("Its not your turn to play");
       return;
@@ -154,11 +145,9 @@ function createRobot() {
 
   const playAtBestPosition = (state) => {
     if (isMyturn) {
-      //check current state and see all actions that can be taken, i.e free cells and store them
       if (gameBoard.gameBoardIsEmpty()) {
         //manually playing the first move for performance issues
         gameBoard.placeMark(0, mark);
-        domManipulations.placeMark(0, mark);
       } else {
         let bestAction =
           aiMethods.actions(state)[
@@ -169,10 +158,9 @@ function createRobot() {
         //     gameBoard.getPositionsNames()[bestAction]
         //   } for player ${mark}`
         // );
-
         // console.log("END OF SIMULATION");
+
         gameBoard.placeMark(bestAction, mark);
-        domManipulations.placeMark(bestAction, "X");
       }
     } else {
       console.log("Not your turn android!");
@@ -256,7 +244,6 @@ const aiMethods = (function () {
     // console.log(
     //   `Player ${playerMark} can make a move in ${freeCellspositions.length} possible positions.`
     // );
-
     // for (const position of freeCellspositions) {
     //   console.log(
     //     `At position ${position}: ${gameBoard.getPositionsNames()[position]}`
@@ -268,14 +255,7 @@ const aiMethods = (function () {
   const result = (state, action) => {
     let newState = Array.from(state);
     newState[action] = playerTomakeMove(state);
-    console.log(
-      "R E S U L T I N G S T A T E " +
-        `as player ${playerTomakeMove(state)} plays.`
-    );
 
-    console.log(
-      `${newState[0]},${newState[1]},${newState[2]},\n${newState[3]},${newState[4]},${newState[5]},\n${newState[6]},${newState[7]},${newState[8]}`
-    );
     return newState;
   };
   //TERMINAL(s) => checks if state s is a terminal state i.e a player wins or game ends in a tie
@@ -285,8 +265,6 @@ const aiMethods = (function () {
     state.filter((child) => child == null).length == 0;
 
   const terminalState = (state) => {
-    // console.log("Current State", state);
-
     if (
       state.filter((child) => child == null).length == 0 &&
       !hasPlayerWon(state, "X") &&
@@ -336,8 +314,6 @@ const aiMethods = (function () {
         `The value of this board when played at ${action} is ${value}`
       );
     }
-    // console.log(actions(state));
-    // console.log(values);
 
     return returnArray ? values : value;
   };
@@ -416,13 +392,6 @@ function gameController(player1, player2, numberOfGamesToPlay) {
       drawScore: draws,
     });
   };
-  const resetGame = () => {
-    player1.resetScore();
-    player2.resetScore();
-    gameBoard.resetBoard();
-    numberOfDraws = 0;
-    numberOfGames = numberOfGamesToPlay;
-  };
   const setPlayerTurn = () => {
     player1.toggleTurn();
     player2.toggleTurn();
@@ -468,6 +437,7 @@ const domManipulations = (function () {
   const controls = gameContainer.querySelector(".controls");
   const clearButton = controls.querySelector(".clear");
   const nextRoundButton = controls.querySelector(".next-round");
+
 
   const startButton = controls.querySelector(".start");
 
@@ -515,15 +485,13 @@ const domManipulations = (function () {
     }, 1000);
   };
 
-  function moveGameOffScreen() {
+  function moveGame({ offScreen }) {
     const window = document.querySelector(".window");
-    window.style.transform = `translateX(${-100}%)`;
+    offScreen
+      ? (window.style.transform = `translateX(${-100}%)`)
+      : (window.style.transform = `translateX(${0}%)`);
   }
 
-  function moveGameBackToInitialPosition() {
-    const window = document.querySelector(".window");
-    window.style.transform = `translateX(${0}%)`;
-  }
   const hideStartButtonAndShowLiveInfoSection = (show) => {
     if (show) {
       startButton.style.display = "block";
@@ -567,7 +535,7 @@ const domManipulations = (function () {
     nextRoundButtonOn = !nextRoundButtonOn;
   };
 
-  startButton.addEventListener("click", moveGameOffScreen);
+  startButton.addEventListener("click", () => moveGame({ offScreen: true }));
 
   clearButton.addEventListener("click", () => {
     if (gameOn && !clearButton.classList.contains("inactive")) {
@@ -599,8 +567,9 @@ const domManipulations = (function () {
   humanStartGameButton.addEventListener("click", (e) => {
     if (xPlayerName.value && oPlayerName.value) {
       e.preventDefault();
-      moveGameBackToInitialPosition();
+      moveGame({ offScreen: false });
       hideStartButtonAndShowLiveInfoSection();
+    clearButton.classList.toggle("inactive");
       xPlayer = createHumanPlayer(xPlayerName.value, "X");
       oPlayer = createHumanPlayer(oPlayerName.value, "O");
       numberOfGamesToPlay = parseInt(humanNumberOfGames.innerText);
@@ -612,8 +581,10 @@ const domManipulations = (function () {
   aiStartGameButton.addEventListener("click", (e) => {
     if (playerName.value) {
       e.preventDefault();
-      moveGameBackToInitialPosition();
+      moveGame({ offScreen: false });
       hideStartButtonAndShowLiveInfoSection();
+    clearButton.classList.toggle("inactive");
+
       xPlayer = createRobot();
       oPlayer = createHumanPlayer(oPlayerName.value, "O");
       numberOfGamesToPlay = parseInt(aiNumberOfGames.innerText);
@@ -656,6 +627,8 @@ const domManipulations = (function () {
     dialog.close();
     gameBoard.resetBoard();
     resetBoard();
+    nextRoundButton.classList.toggle("inactive");
+
     controller = null;
     gameOn = false;
     nextRoundButtonOn = false;
