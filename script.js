@@ -1,6 +1,16 @@
 const gameBoard = (function () {
   const board = Array(9).fill(null);
-  const positionNames = ["topLeft","topCenter","topRight","centerLeft","center","centerRight","bottomLeft","bottomCenter","bottomRight"];
+  const positionNames = [
+    "topLeft",
+    "topCenter",
+    "topRight",
+    "centerLeft",
+    "center",
+    "centerRight",
+    "bottomLeft",
+    "bottomCenter",
+    "bottomRight",
+  ];
 
   const placeMark = function (position, playerMark) {
     if (position > board.length - 1 || position < 0) {
@@ -77,7 +87,16 @@ const gameBoard = (function () {
     }
   };
 
-  return {placeMark,getBoard,resetBoard,isFilledUp,arrayOfFreeCells,getPositionsNames,gameBoardIsEmpty,satisfiesWinningConditions};
+  return {
+    placeMark,
+    getBoard,
+    resetBoard,
+    isFilledUp,
+    arrayOfFreeCells,
+    getPositionsNames,
+    gameBoardIsEmpty,
+    satisfiesWinningConditions,
+  };
 })();
 
 function createHumanPlayer(name, mark = "O") {
@@ -102,7 +121,17 @@ function createHumanPlayer(name, mark = "O") {
   const resetScore = () => (score = 0);
   const isAi = () => false;
 
-  return {playAtPosition,getMark,getName,getTurn,toggleTurn,increaseScore,getScore,resetScore,isAi};
+  return {
+    playAtPosition,
+    getMark,
+    getName,
+    getTurn,
+    toggleTurn,
+    increaseScore,
+    getScore,
+    resetScore,
+    isAi,
+  };
 }
 function createRobot() {
   const name = "Robot";
@@ -170,7 +199,19 @@ function createRobot() {
   const resetScore = () => (score = 0);
   const isAi = () => true;
 
-  return {playAtRandomPosition,getMark,getName,getTurn,toggleTurn,playAtBestPosition,getIndexOfBestValue,increaseScore,getScore,resetScore,isAi};
+  return {
+    playAtRandomPosition,
+    getMark,
+    getName,
+    getTurn,
+    toggleTurn,
+    playAtBestPosition,
+    getIndexOfBestValue,
+    increaseScore,
+    getScore,
+    resetScore,
+    isAi,
+  };
 }
 
 const aiMethods = (function () {
@@ -320,7 +361,15 @@ const aiMethods = (function () {
     return value;
   };
 
-  return {playerTomakeMove,actions,result,terminalState,gameUtility,minValue,maxValue,};
+  return {
+    playerTomakeMove,
+    actions,
+    result,
+    terminalState,
+    gameUtility,
+    minValue,
+    maxValue,
+  };
 })();
 
 function gameController(player1, player2, numberOfGamesToPlay) {
@@ -349,22 +398,23 @@ function gameController(player1, player2, numberOfGamesToPlay) {
 
   const annouceWinner = () => {
     let announcement;
-    let xPlayerScore = `${player1.getMark()} Player's Score: ${player1.getScore()}`;
-    let oPlayerScore = `${player2.getMark()} Player's Score: ${player2.getScore()}`;
-    let drawScore = `${numberOfDraws} Draws.`
+    let xScore = `${player1.getMark()} Player's Score: ${player1.getScore()}`;
+    let oScore = `${player2.getMark()} Player's Score: ${player2.getScore()}`;
+    let draws = `${numberOfDraws} draw(s).`;
     if (player1.getScore() > player2.getScore()) {
-      
       announcement = `The winner is ${player1.getMark()} player: ${player1.getName()}`;
     } else if (player2.getScore() > player1.getScore()) {
-      announcement =
-        `The winner is ${player2.getMark()} player: ${player2.getName()}`
-      ;
+      announcement = `The winner is ${player2.getMark()} player: ${player2.getName()}`;
     } else {
       announcement = "Game Ended in a Draw!!";
     }
 
-    domManipulations.announceWinner(announcement,xPlayerScore,oPlayerScore,drawScore);
-    
+    domManipulations.announceWinner({
+      winner: announcement,
+      xPlayerScore: xScore,
+      oPlayerScore: oScore,
+      drawScore: draws,
+    });
   };
   const resetGame = () => {
     player1.resetScore();
@@ -401,7 +451,7 @@ function gameController(player1, player2, numberOfGamesToPlay) {
 const domManipulations = (function () {
   let gameOn = false;
   let nextRoundButtonOn = false;
-  let xPlayer, oPlayer, numberOfGamesToPlay ;
+  let xPlayer, oPlayer, numberOfGamesToPlay;
   const gameContainer = document.querySelector(".game");
   const scoreBoard = gameContainer.querySelector(".score-board");
   const xPlayerScore = scoreBoard.querySelector(".x-player-score h1");
@@ -435,14 +485,18 @@ const domManipulations = (function () {
   const dialog = document.querySelector("dialog");
   const closeButton = dialog.querySelector("button");
 
-  const announceWinner = (winner,xPlayerScore,oPlayerScore,drawScore)=>{
-    dialog.querySelector('.final-scores h1').textContent = winner;
-    const infoDiv = dialog.querySelector('.final-scores div').childNodes;
+  const announceWinner = ({
+    winner,
+    xPlayerScore,
+    oPlayerScore,
+    drawScore,
+  }) => {
+    dialog.querySelector(".final-scores h1").textContent = winner;
+    const infoDiv = dialog.querySelector(".final-scores div").childNodes;
     infoDiv[0].textContent = xPlayerScore;
     infoDiv[1].textContent = oPlayerScore;
     infoDiv[2].textContent = drawScore;
     dialog.show();
-    
   };
   const addCells = (() => {
     for (let i = 0; i < gameBoard.getBoard().length; i++) {
@@ -485,17 +539,22 @@ const domManipulations = (function () {
     clearButton.classList.toggle("inactive");
   };
 
-  const placeMark = (position, mark) =>(boardUi.childNodes[position].innerText = mark);
+  const placeMark = (position, mark) =>
+    (boardUi.childNodes[position].innerText = mark);
   const updateXplayerScore = (newScore) => (xPlayerScore.innerText = newScore);
   const updateOplayerScore = (newScore) => (oPlayerScore.innerText = newScore);
   const updateDrawCount = (newScore) => (drawCount.innerText = newScore);
   const showRoundWinner = (message) => {
     roundWinner.textContent = "";
     roundWinner.textContent = message;
-    setTimeout(() => {roundWinner.textContent = "";}, 3000);
+    setTimeout(() => {
+      roundWinner.textContent = "";
+    }, 3000);
   };
   const updateCurrentPlayerMark = () => {
-    currentPlayerMark.innerText = xPlayer.getTurn()? xPlayer.getMark(): oPlayer.getMark();
+    currentPlayerMark.innerText = xPlayer.getTurn()
+      ? xPlayer.getMark()
+      : oPlayer.getMark();
   };
   const resetBoard = () => {
     boardUi.childNodes.forEach((element) => {
@@ -507,8 +566,6 @@ const domManipulations = (function () {
     gameOn = !gameOn;
     nextRoundButtonOn = !nextRoundButtonOn;
   };
-
-
 
   startButton.addEventListener("click", moveGameOffScreen);
 
@@ -570,13 +627,21 @@ const domManipulations = (function () {
     if (gameOn) {
       if (e.target.matches(".cell") && e.target.innerText == "") {
         if (xPlayer.getTurn()) {
-          xPlayer.playAtPosition(parseInt(e.target.dataset.index),xPlayer.getMark());
+          xPlayer.playAtPosition(
+            parseInt(e.target.dataset.index),
+            xPlayer.getMark()
+          );
         } else if (oPlayer.getTurn()) {
-          oPlayer.playAtPosition(parseInt(e.target.dataset.index),oPlayer.getMark());
+          oPlayer.playAtPosition(
+            parseInt(e.target.dataset.index),
+            oPlayer.getMark()
+          );
           if (xPlayer.isAi()) {
             setAiThoughts("Thinking...");
             gameOn = false;
-            setTimeout(() => {xPlayer.playAtBestPosition(gameBoard.getBoard());}, 60);
+            setTimeout(() => {
+              xPlayer.playAtBestPosition(gameBoard.getBoard());
+            }, 60);
             updateCurrentPlayerMark();
             gameOn = true;
           }
@@ -598,7 +663,18 @@ const domManipulations = (function () {
     oPlayerScore.textContent = "0";
     drawCount.textContent = "0";
   });
-  return {placeMark,updateDrawCount,updateXplayerScore,updateOplayerScore,showRoundWinner,resetBoard,toggleButtonStates,toggleGame,setAiThoughts,announceWinner};
+  return {
+    placeMark,
+    updateDrawCount,
+    updateXplayerScore,
+    updateOplayerScore,
+    showRoundWinner,
+    resetBoard,
+    toggleButtonStates,
+    toggleGame,
+    setAiThoughts,
+    announceWinner,
+  };
 })();
 
 let controller = null;
