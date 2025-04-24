@@ -1,16 +1,6 @@
 const gameBoard = (function () {
   const board = Array(9).fill(null);
-  const positionNames = [
-    "topLeft",
-    "topCenter",
-    "topRight",
-    "centerLeft",
-    "center",
-    "centerRight",
-    "bottomLeft",
-    "bottomCenter",
-    "bottomRight",
-  ];
+  const positionNames = ["topLeft","topCenter","topRight","centerLeft","center","centerRight","bottomLeft","bottomCenter","bottomRight"];
 
   const placeMark = function (position, playerMark) {
     board[position] = playerMark;
@@ -153,13 +143,6 @@ function createRobot() {
           aiMethods.actions(state)[
             getIndexOfBestValue(aiMethods.maxValue(state, true))
           ];
-        // console.log(
-        //   `The best position to play is ${bestAction}: ${
-        //     gameBoard.getPositionsNames()[bestAction]
-        //   } for player ${mark}`
-        // );
-        // console.log("END OF SIMULATION");
-
         gameBoard.placeMark(bestAction, mark);
       }
     } else {
@@ -210,7 +193,6 @@ const aiMethods = (function () {
     if (state.filter((child) => child == null).length == state.length) {
       mark = "X";
     }
-    //When both X and O have equal number of plays, following the logic of X being the first player it is X's turn to play
     if (
       state.filter((child) => child == "O").length ==
       state.filter((child) => child == "X").length
@@ -241,14 +223,6 @@ const aiMethods = (function () {
       freeCellspositions.push(pos);
     }
 
-    // console.log(
-    //   `Player ${playerMark} can make a move in ${freeCellspositions.length} possible positions.`
-    // );
-    // for (const position of freeCellspositions) {
-    //   console.log(
-    //     `At position ${position}: ${gameBoard.getPositionsNames()[position]}`
-    //   );
-    // }
     return freeCellspositions;
   };
   //RESULT(s,a) => returns the state after action a taken in state s
@@ -302,17 +276,8 @@ const aiMethods = (function () {
     let value = -Infinity;
     let values = [];
     for (const action of actions(state)) {
-      console.log(
-        `Player ${playerTomakeMove(state)} Playing at position ${action}`
-      );
-
       value = Math.max(value, minValue(result(state, action)));
-      console.log(value);
-
       values.push(value);
-      console.log(
-        `The value of this board when played at ${action} is ${value}`
-      );
     }
 
     return returnArray ? values : value;
@@ -328,9 +293,6 @@ const aiMethods = (function () {
     let value = Infinity;
     // let values = [];
     for (const action of actions(state)) {
-      console.log(
-        `Player ${playerTomakeMove(state)} Playing at position ${action}`
-      );
       value = Math.min(value, maxValue(result(state, action)));
       // values.push(value);
     }
