@@ -5,6 +5,16 @@ A feature-rich, DOM-driven **Tic-Tac-Toe** game built with vanilla JavaScript.
 Play against a human or challenge a simple yet powerful AI that uses the Minimax algorithm for optimal gameplay. The game supports multiple rounds, keeps scores, and provides dynamic UI updates.
 
 ---
+
+## Concepts Learned and practiced
+
+* The Module Pattern: Immediately Invoked function execution (IIFEs)
+* Factory Functions
+* Advanced DOM Manipulations
+* Named Parameters in JS using object destructuring
+* Closures
+* Encapsulation with the module pattern
+* Prototypal Inheritance using factories
 ## ✨ Features
 
 * 🧑‍🤝‍🧑 **Player vs Player** and 🤖 **Player vs AI** modes
