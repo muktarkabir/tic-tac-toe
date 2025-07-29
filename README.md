@@ -1,4 +1,4 @@
-# 🧠 Tic-Tac-Toe AI Game
+# 🧠 Tic-Tac-Toe Game
 
 A feature-rich, DOM-driven **Tic-Tac-Toe** game built with vanilla JavaScript. 
 
