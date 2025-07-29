@@ -19,13 +19,20 @@ Play against a human or challenge a simple yet powerful AI that uses the Minimax
 ---
 ## 📸 Screenshots
 
+### First Screen
+![Main Screen](assets/screenshots/tic-tac-toe.png)
 ### 🧑‍🤝‍🧑 Player vs Player Mode
+![Player vs Player Dialog](assets/screenshots/1v1.png)
 
 ### 🤖 Player vs AI Mode
+![Player vs AI Dialog](assets/screenshots/1vai.png)
 
 ### 🏆 Game Over Dialog
+![Game Over Dialog](assets/screenshots/winner.png)
 
 ### 📊 Scoreboard UI
+![Active Gameplay UI](assets/screenshots/gamewon.png)
+
 ---
 
 ## 🧩 Architecture Overview
