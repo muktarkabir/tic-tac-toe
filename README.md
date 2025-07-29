@@ -15,6 +15,7 @@ Play against a human or challenge a simple yet powerful AI that uses the Minimax
 * Closures
 * Encapsulation with the module pattern
 * Prototypal Inheritance using factories
+
 ## ✨ Features
 
 * 🧑‍🤝‍🧑 **Player vs Player** and 🤖 **Player vs AI** modes
