@@ -79,11 +79,6 @@ Factory function for creating an AI player.
 
 Encapsulates Minimax logic.
 
-* `actions(state)` – Legal moves
-* `result(state, action)` – Next state after move
-* `terminalState(state)` – Checks for win/draw
-* `gameUtility(state)` – Final game value (+1, -1, 0)
-* `minValue()` / `maxValue()` – Recursive Minimax logic
 
 ### `gameController(player1, player2, numberOfGames)`
 
